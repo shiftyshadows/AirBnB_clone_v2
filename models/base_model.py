@@ -1,44 +1,82 @@
 #!/usr/bin/python3
-"""This module defines a base class for all models in our hbnb clone"""
+""" This module defines the base class that other classes inherit from.  """
 import uuid
 from datetime import datetime
+from models import storage
+from sqlalchemy import Column, String, DateTime
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
+time_format = "%Y-%m-%dT%H:%M:%S.%f"
 
 
-class BaseModel:
-    """A base class for all hbnb models"""
+class BaseModel(Base):
+    """ This class defines all common attributes/methods for other classes. """
+    __tablename__ = 'base_model'
+    id = Column(String(60), primary_key=True, nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
+
     def __init__(self, *args, **kwargs):
-        """Instatntiates a new model"""
-        if not kwargs:
-            from models import storage
+        """
+           This class method that serves as the constructor for the class.
+           It is automatically called when an instance of the class is created,
+           and its purpose is to initialize the attributes of the object.
+        """
+        if kwargs:
+            for key, value in kwargs.items():
+                if key != "__class__":
+                    setattr(self, key, value)
+            if hasattr(self, "created_at") and type(self.created_at) is str:
+                self.created_at = datetime.strptime(
+                    kwargs["created_at"], time_format)
+            if hasattr(self, "updated_at") and type(self.updated_at) is str:
+                self.updated_at = datetime.strptime(
+                    kwargs["updated_at"], time_format)
+        else:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
-            self.updated_at = datetime.now()
-            storage.new(self)
-        else:
-            kwargs['updated_at'] = datetime.strptime(kwargs['updated_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
-            kwargs['created_at'] = datetime.strptime(kwargs['created_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
-            del kwargs['__class__']
-            self.__dict__.update(kwargs)
+            self.updated_at = self.created_at
 
     def __str__(self):
-        """Returns a string representation of the instance"""
-        cls = (str(type(self)).split('.')[-1]).split('\'')[0]
-        return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
+        """
+           This class method defines how an object should be represented
+           as a string when it is converted using the built-in str() function
+           or when it is used in string formatting.
+        """
+        class_name = self.__class__.__name__
+        return "[{}] ({}) {}".format(class_name, self.id, self.__dict__)
 
     def save(self):
-        """Updates updated_at with current time when instance is changed"""
-        from models import storage
+        """
+           This class method updates the public instance
+           attribute updated_at with the current datetime
+        """
         self.updated_at = datetime.now()
+        storage.new(self)
         storage.save()
 
     def to_dict(self):
-        """Convert instance into dict format"""
-        dictionary = {}
-        dictionary.update(self.__dict__)
-        dictionary.update({'__class__':
-                          (str(type(self)).split('.')[-1]).split('\'')[0]})
-        dictionary['created_at'] = self.created_at.isoformat()
-        dictionary['updated_at'] = self.updated_at.isoformat()
-        return dictionary
+        """
+           This method returns a dictionary containing all
+           keys/values of __dict__ of the instance.
+        """
+        obj_dict = self.__dict__.copy()
+        obj_dict['__class__'] = self.__class__.__name__
+#        if "created_at" in obj_dict:
+#            obj_dict["created_at"] = self.created_at.strftime(time_format)
+#        if "updated_at" in obj_dict:
+#            obj_dict["updated_at"] = self.updated_at.strftime(time_format)
+        if "created_at" in obj_dict:
+            obj_dict["created_at"] = obj_dict["created_at"].\
+                strftime(time_format)
+        if "updated_at" in obj_dict:
+            obj_dict["updated_at"] = obj_dict["updated_at"].\
+                strftime(time_format)
+        if "_sa_instance_state" in obj_dict:
+            del obj_dict["_sa_instance_state"]
+        return obj_dict
+
+    def delete(self):
+        storage.delete(self)
+        storage.save()
