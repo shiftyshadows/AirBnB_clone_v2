@@ -10,7 +10,7 @@ Base = declarative_base()
 time_format = "%Y-%m-%dT%H:%M:%S.%f"
 
 
-class BaseModel(Base):
+class BaseModel():
     """ This class defines all common attributes/methods for other classes. """
     __tablename__ = 'base_model'
     id = Column(String(60), primary_key=True, nullable=False)

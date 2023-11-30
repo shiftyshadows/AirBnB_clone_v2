@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 # Set environmental variables
 export HBNB_ENV='test'

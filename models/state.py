@@ -3,25 +3,27 @@
 from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.orm import relationship
 from models.base_model import BaseModel, Base
+from models import storage
 
 class State(BaseModel, Base):
-    """Representation of state """
+    """ Representation of state """
     __tablename__ = 'states'  # Add the table name
     name = Column(String(128), nullable=False) # For DBStorage
-    cities = relationship('City', backref='state', cascade='all, delete-orphan')
+    cities = relationship('City', backref='state', cascade='all, delete, delete-orphan')
 
     def __init__(self, *args, **kwargs):
         """
-        This class method that serves as the constructor for the class.
-        It is automatically called when an instance of the class is created,
-        and its purpose is to initialize the attributes of the object.
+           This class method that serves as the constructor for the class.
+           It is automatically called when an instance of the class is created,
+           and its purpose is to initialize the attributes of the object.
         """
         super().__init__(*args, **kwargs)
+        Base.metadata.create_all(storage._DBStorage__engine)
 
     # For FileStorage
     @property
     def cities(self):
-        """Getter attribute for cities in FileStorage"""
+        """ Getter attribute for cities in FileStorage. """
         from models import storage
         city_list = []
         for city in storage.all('City').values():

@@ -1,9 +1,11 @@
 #!/usr/bin/python3
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
-from models.base_model import Base
+#from models.base_model import Base
+from sqlalchemy.ext.declarative import declarative_base
 from os import environ
 
+Base = declarative_base()
 
 class DBStorage:
     """DBStorage class for managing the MySQL database"""
@@ -25,8 +27,8 @@ class DBStorage:
             pool_pre_ping=True
         )
 
-        if env == 'test':
-            Base.metadata.drop_all(self.__engine)
+#        if env == 'test':
+#            Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
         """Query on the current database session"""
