@@ -1,10 +1,10 @@
 #!/usr/bin/python3
-""" Place Module for HBNB project """
+""" This module defines the class: Place.  """
 from models.base_model import BaseModel
 
 
 class Place(BaseModel):
-    """ A place to stay """
+    """Representation of Place """
     city_id = ""
     user_id = ""
     name = ""
@@ -16,3 +16,11 @@ class Place(BaseModel):
     latitude = 0.0
     longitude = 0.0
     amenity_ids = []
+
+    def __init__(self, *args, **kwargs):
+        """
+           This class method that serves as the constructor for the class.
+           It is automatically called when an instance of the class is created,
+           and its purpose is to initialize the attributes of the object.
+        """
+        super().__init__(*args, **kwargs)

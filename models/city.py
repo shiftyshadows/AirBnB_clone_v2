@@ -1,23 +1,21 @@
 #!/usr/bin/python3
-""" City Module for HBNB project """
-from sqlalchemy import Column, String, ForeignKey
-from models.base_model import BaseModel, Base
-#from sqlalchemy.orm import relationship
-#from models.place import Place
+""" This module defines the class: City.  """
+from models.base_model import BaseModel
 
 
-class City(BaseModel, Base):
+class City(BaseModel):
     """Representation of city """
-    __tablename__ = 'cities'
-    name = Column(String(128), nullable=False)
-    state_id = Column(String(60), ForeignKey('states.id'), nullable=False)
-#    places = relationship("Place", cascade='all, delete, delete-orphan',
-#                          backref="city")
+    state_id = ""
+    name = ""
 
-#    def __init__(self, *args, **kwargs):
-    """
-       This class method that serves as the constructor for the class.
-       It is automatically called when an instance of the class is created,
-       and its purpose is to initialize the attributes of the object.
-    """
-#        super().__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        """
+           This class method that serves as the constructor for the class.
+           It is automatically called when an instance of the class is created,
+           and its purpose is to initialize the attributes of the object.
+        """
+        if 'state_id' not in kwargs:
+            self.state_id = ""
+        else:
+            self.state_id = kwargs.pop('state_id')
+        super().__init__(*args, **kwargs)

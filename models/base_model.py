@@ -3,20 +3,12 @@
 import uuid
 from datetime import datetime
 from models import storage
-from sqlalchemy import Column, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
 
-Base = declarative_base()
 time_format = "%Y-%m-%dT%H:%M:%S.%f"
 
 
-class BaseModel():
+class BaseModel:
     """ This class defines all common attributes/methods for other classes. """
-    __tablename__ = 'base_model'
-    id = Column(String(60), primary_key=True, nullable=False)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
-
     def __init__(self, *args, **kwargs):
         """
            This class method that serves as the constructor for the class.
@@ -37,6 +29,8 @@ class BaseModel():
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
             self.updated_at = self.created_at
+            storage.new(self)
+            storage.save()
 
     def __str__(self):
         """
@@ -53,7 +47,6 @@ class BaseModel():
            attribute updated_at with the current datetime
         """
         self.updated_at = datetime.now()
-        storage.new(self)
         storage.save()
 
     def to_dict(self):
@@ -73,10 +66,4 @@ class BaseModel():
         if "updated_at" in obj_dict:
             obj_dict["updated_at"] = obj_dict["updated_at"].\
                 strftime(time_format)
-        if "_sa_instance_state" in obj_dict:
-            del obj_dict["_sa_instance_state"]
         return obj_dict
-
-    def delete(self):
-        storage.delete(self)
-        storage.save()

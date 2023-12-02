@@ -1,10 +1,18 @@
 #!/usr/bin/python3
-""" Review module for the HBNB project """
+""" This module defines the class: Review.  """
 from models.base_model import BaseModel
 
 
 class Review(BaseModel):
-    """ Review classto store review information """
+    """Representation of Review """
     place_id = ""
     user_id = ""
     text = ""
+
+    def __init__(self, *args, **kwargs):
+        """
+           This class method that serves as the constructor for the class.
+           It is automatically called when an instance of the class is created,
+           and its purpose is to initialize the attributes of the object.
+        """
+        super().__init__(*args, **kwargs)
