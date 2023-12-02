@@ -160,51 +160,51 @@ class HBNBCommand(cmd.Cmd):
                         return
 
     def do_create(self, arg):
-    """Create a new instance of a specified class with given parameters"""
-    args = arg.split()
-    if len(args) == 0:
-        print("** class name missing **")
-        return
+        """Create a new instance of a specified class with given parameters"""
+        args = arg.split()
+        if len(args) == 0:
+            print("** class name missing **")
+            return
 
-    class_name = args[0]
-    if class_name not in HBNBCommand.cls_dict.keys():
-        print("** class doesn't exist **")
-        return
+        class_name = args[0]
+        if class_name not in HBNBCommand.cls_dict.keys():
+            print("** class doesn't exist **")
+            return
 
     # Check if parameters are provided
-    if len(args) < 2:
-        print("** parameters missing **")
-        return
+        if len(args) < 2:
+            print("** parameters missing **")
+            return
 
     # Get parameters
-    params = ' '.join(args[2:])
+        params = ' '.join(args[2:])
 
     # Remove double quotes around the parameters
-    params = re.sub(r'"(.*?)"', r'\1', params)
+        params = re.sub(r'"(.*?)"', r'\1', params)
 
     # Split parameters into key-value pairs
-    param_list = params.split()
+        param_list = params.split()
 
     # Create a dictionary to store key-value pairs
-    param_dict = {}
-    for param in param_list:
+        param_dict = {}
+        for param in param_list:
         # Split each key-value pair
-        key, value = param.split('=')
+            key, value = param.split('=')
 
         # Replace underscores with spaces in the key
-        key = key.replace('_', ' ')
+            key = key.replace('_', ' ')
 
         # Add the key-value pair to the dictionary
-        param_dict[key] = value
+            param_dict[key] = value
 
     # Create a new instance of the specified class with the given parameters
-    new_instance = HBNBCommand.cls_dict[class_name](**param_dict)
+        new_instance = HBNBCommand.cls_dict[class_name](**param_dict)
 
     # Save the new instance
-    new_instance.save()
+        new_instance.save()
 
     # Print the ID of the new instance
-    print(new_instance.id)
+        print(new_instance.id)
 
 
     def do_show(self, arg):
