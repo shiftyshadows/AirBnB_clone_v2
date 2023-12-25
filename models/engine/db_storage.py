@@ -2,8 +2,10 @@
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
-from models.base_model import Base
+from sqlalchemy.ext.declarative import declarative_base
 from os import environ
+
+Base=declarative_base()
 
 class DBStorage:
     """This class manages the storage of the MySQL database."""
