@@ -1,10 +1,18 @@
 #!/usr/bin/python3
 """ This module defines the class: City.  """
-from models.base_model import BaseModel
+from models.base_model import BaseModel, Base
+from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy.orm import relationship
 
 
-class City(BaseModel):
+class City(BaseModel, Base):
     """Representation of city """
+    __tablename__ = 'cities'
+    name = Column(String(128), nullable=False)
+    state_id = Column(String(60), ForeignKey('states.id'), nullable=False)
+    # Define relationship to State
+    state = relationship("State", back_populates="cities")
+
 
     def __init__(self, *args, **kwargs):
         """
