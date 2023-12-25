@@ -162,6 +162,7 @@ class HBNBCommand(cmd.Cmd):
     def do_create(self, arg):
         """Create a new instance of BaseModel, save it, and print its id"""
         args = arg.split()
+        param_count = len(args) - 1
         if len(args) == 0:
             print("** class name missing **")
             return
@@ -169,9 +170,39 @@ class HBNBCommand(cmd.Cmd):
         if class_name not in HBNBCommand.cls_dict.keys():
             print("** class doesn't exist **")
             return
-        for key in HBNBCommand.cls_dict.keys():
-            if class_name == key:
-                new_instance = eval(key)()
+
+        if param_count > 0:
+            param_list = []
+            for param in args[1:]:
+                if '=' in param:
+                    param_key, param_value = param.split('=')
+                    try:
+                        param_value = eval(param_value)
+                    except NameError as e:
+                        print("NameError: Enclose the parameter value in quotation marks")
+                        return
+                    else:
+                        param_type = type(param_value)
+                        if param_type is str:
+                            param_value = param_value.replace("_", " ")
+                        if param_type not in [int, str, float]:
+                            print("** Unsupported parameter value **")
+                            return
+                        else:
+                            param_tuple = (param_key, param_value)
+                            param_list.append(param_tuple)
+                else:
+                    print("** Invalid Parameter: Use the syntax: <key name>=<value> **")
+                    return
+            for key in HBNBCommand.cls_dict.keys():
+                if class_name == key:
+                    kwargs_dict = dict(param_list)
+                    new_instance = eval(key)(self, *args, **kwargs_dict)
+
+        else:
+            for key in HBNBCommand.cls_dict.keys():
+                if class_name == key:
+                    new_instance = eval(key)()
         new_instance.save()
         print(new_instance.id)
 

@@ -5,8 +5,6 @@ from models.base_model import BaseModel
 
 class City(BaseModel):
     """Representation of city """
-    state_id = ""
-    name = ""
 
     def __init__(self, *args, **kwargs):
         """
@@ -14,8 +12,6 @@ class City(BaseModel):
            It is automatically called when an instance of the class is created,
            and its purpose is to initialize the attributes of the object.
         """
-        if 'state_id' not in kwargs:
-            self.state_id = ""
-        else:
-            self.state_id = kwargs.pop('state_id')
         super().__init__(*args, **kwargs)
+        self.state_id = kwargs.get('state_id', "")
+        self.name = kwargs.get('name', "")
