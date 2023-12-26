@@ -28,14 +28,14 @@ class DBStorage:
         password = os.environ.get('HBNB_MYSQL_PWD')
         host = os.environ.get('HBNB_MYSQL_HOST', 'localhost')
         database = os.environ.get('HBNB_MYSQL_DB')
-
+        env = os.environ.get('HBNB_ENV')
         dialect = 'mysql'
         driver = 'mysqldb'
-        pool_pre_ping = True if os.environ.get('HBNB_ENV') == 'test' else False
+        ppp = True if os.environ.get('HBNB_ENV') == 'test' else False
 
         connection_string = f'{dialect}+{driver}://{user}:{password}@{host}/{database}'
-        self.__engine = create_engine(connection_string, pool_pre_ping=pool_pre_ping)
-        if os.environ.get('HBNB_ENV') == 'test':
+        self.__engine = create_engine(connection_string, pool_pre_ping=ppp)
+        if env == 'test':
             meta = MetaData(self.__engine)
             meta.reflect()
             meta.drop_all()
@@ -90,6 +90,9 @@ class DBStorage:
 
     def reload(self):
         """Create all tables in the database and create the current database session."""
+        from models.base_model import BaseModel
+        from models.state import State
+        from models.city import City
         Base.metadata.create_all(self.__engine)
         session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
         self.__session = scoped_session(session_factory)
