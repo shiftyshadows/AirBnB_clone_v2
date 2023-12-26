@@ -6,6 +6,11 @@ from sqlalchemy.ext.declarative import declarative_base
 import os
 
 Base=declarative_base()
+#os.environ["HBNB_MYSQL_USER"] = "hbnb_dev"
+#os.environ["HBNB_MYSQL_PWD"] = "hbnb_dev_pwd"
+#os.environ["HBNB_MYSQL_HOST"] = "localhost"
+#os.environ["HBNB_MYSQL_DB"] = "hbnb_dev_db"
+#os.environ["HBNB_TYPE_STORAGE"] = "db"
 
 class DBStorage:
     __engine = None
@@ -17,6 +22,7 @@ class DBStorage:
            MySQL database using environment variables. It also drops all tables
            if the environment variable HBNB_ENV is equal to 'test'.
         """
+
 
         user = os.environ.get('HBNB_MYSQL_USER')
         password = os.environ.get('HBNB_MYSQL_PWD')

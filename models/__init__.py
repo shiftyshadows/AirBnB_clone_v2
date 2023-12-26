@@ -2,6 +2,12 @@
 """Initializes the package"""
 from os import environ
 
+environ["HBNB_MYSQL_USER"] = "hbnb_dev"
+environ["HBNB_MYSQL_PWD"] = "hbnb_dev_pwd"
+environ["HBNB_MYSQL_HOST"] = "localhost"
+environ["HBNB_MYSQL_DB"] = "hbnb_dev_db"
+environ["HBNB_TYPE_STORAGE"] = "db"
+
 HBNB_TYPE_STORAGE = environ.get('HBNB_TYPE_STORAGE')
 
 if HBNB_TYPE_STORAGE == 'db':
