@@ -2,9 +2,9 @@
 """ This module defines the base class that other classes inherit from.  """
 import uuid
 from datetime import datetime
-from models import storage
 from sqlalchemy import Column, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
+from models import storage
 
 time_format = "%Y-%m-%dT%H:%M:%S.%f"
 
