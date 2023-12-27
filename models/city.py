@@ -24,5 +24,5 @@ class City(BaseModel, Base):
         self.state_id = kwargs.get('state_id', "")
         self.name = kwargs.get('name', "")
 
-engine = create_engine("mysql://hbnb_dev:hbnb_dev_pwd@localhost/hbnb_dev_db", echo=True)
+engine = create_engine("mysql+mysqldb://hbnb_dev:hbnb_dev_pwd@localhost/hbnb_dev_db", echo=False)
 Base.metadata.create_all(engine)
