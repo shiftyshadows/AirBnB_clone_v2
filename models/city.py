@@ -20,7 +20,7 @@ class City(BaseModel, Base):
            It is automatically called when an instance of the class is created,
            and its purpose is to initialize the attributes of the object.
         """
-        self.name = kwargs.get('name',"-")
+#        self.name = kwargs.get('name')
         self.state_id = kwargs.get('state_id', "")
         super().__init__(*args, **kwargs)
 
