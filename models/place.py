@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """ This module defines the class: Place.  """
 from models.base_model import BaseModel, Base
-from sqlalchemy import Column, String, Integer, Float, ForeignKey, create_engine
+from sqlalchemy import Column, String, Integer, Float, ForeignKey
 from sqlalchemy.orm import relationship
 
 class Place(BaseModel,Base):
@@ -21,7 +21,8 @@ class Place(BaseModel,Base):
     user = relationship('User', back_populates='places')
     # Define the back-reference from Place to City
     city = relationship('City', back_populates='places')
-
+    # Define the back-reference from Review to Place
+    reviews = relationship('Review', back_populates='place', cascade='all, delete-orphan')
     def __init__(self, *args, **kwargs):
         """
            This class method that serves as the constructor for the class.
@@ -29,7 +30,3 @@ class Place(BaseModel,Base):
            and its purpose is to initialize the attributes of the object.
         """
         super().__init__(*args, **kwargs)
-
-engine = create_engine(
-    "mysql+mysqldb://hbnb_dev:hbnb_dev_pwd@localhost/hbnb_dev_db", echo=False)
-Base.metadata.create_all(engine)

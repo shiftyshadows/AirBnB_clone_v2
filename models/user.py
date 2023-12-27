@@ -15,6 +15,7 @@ class User(BaseModel, Base):
     last_name = Column(String(128), nullable=True)
     # Define the relationship with the Place class
     places = relationship('Place', back_populates='user', cascade='all, delete-orphan')
+    reviews = relationship('Review', back_populates='user', cascade='all, delete-orphan')
 
     def __init__(self, *args, **kwargs):
         """initializes user"""
