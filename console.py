@@ -12,6 +12,7 @@ from models.place import Place
 from models.review import Review
 from models.user import User
 
+
 class HBNBCommand(cmd.Cmd):
     """
        This class defines the attributes and methods for the
@@ -137,8 +138,9 @@ class HBNBCommand(cmd.Cmd):
                                           list_args[0], list_args[1]))
                                     return
                                 elif len(list_args) == 3:
-                                    argm_string = "{} {} {} {}".format(match_class,
-                                          list_args[0], list_args[1], list_args[2])
+                                    argm_string = "{} {} {} {}".format(
+                                        match_class, list_args[0],
+                                        list_args[1], list_args[2])
                                     value(argm_string)
                         else:
                             print("** unknown syntax **")
@@ -178,7 +180,7 @@ class HBNBCommand(cmd.Cmd):
                     try:
                         param_value = eval(param_value)
                     except NameError as e:
-                        print("NameError: Enclose the parameter value in quotation marks")
+                        print("NameError: Enclose value in quotation marks")
                         return
                     else:
                         param_type = type(param_value)
@@ -191,7 +193,7 @@ class HBNBCommand(cmd.Cmd):
                             param_tuple = (param_key, param_value)
                             param_list.append(param_tuple)
                 else:
-                    print("** Invalid Parameter: Use the syntax: <key name>=<value> **")
+                    print("** Syntax: <key name>=<value> **")
                     return
             for key in HBNBCommand.cls_dict.keys():
                 if class_name == key:
