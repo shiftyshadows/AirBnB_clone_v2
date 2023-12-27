@@ -2,7 +2,7 @@
 """ This module defines the base class that other classes inherit from.  """
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import Column, String, DateTime, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 
 time_format = "%Y-%m-%dT%H:%M:%S.%f"
@@ -34,6 +34,8 @@ class BaseModel:
         self.id = str(uuid.uuid4())
         self.created_at = datetime.now()
         self.updated_at = self.created_at
+        engine = create_engine("mysql://hbnb_dev:hbnb_dev_pwd@localhost/hbnb_dev_db", echo=True)
+        Base.metadata.create_all(engine)
 
     def __str__(self):
         """
