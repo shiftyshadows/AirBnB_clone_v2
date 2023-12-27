@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 """ This module defines the class: Place.  """
+import os
 from models.base_model import BaseModel, Base
+from models.amenity import Amenity
 from sqlalchemy import Column, String, Integer, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship
 
@@ -32,10 +34,43 @@ class Place(BaseModel,Base):
     city = relationship('City', back_populates='places')
     # Define the back-reference from Review to Place
     reviews = relationship('Review', back_populates='place', cascade='all, delete-orphan')
-    # Define the Many-to-Many relationship with the Amenity class
-    amenities = relationship('Amenity', secondary=place_amenity, back_populates='places', viewonly=False)
     # FileStorage Relationships (Getter and Setter)
     amenity_ids = []
+    # Define the Many-to-Many relationship with the Amenity class
+    if os.getenv('HBNB_TYPE_STORAGE') == 'db':
+        amenities = relationship(
+            'Amenity',
+            secondary=place_amenity,
+            viewonly=False,
+            backref='place_amenities'
+        )
+    else:
+        @property
+        def amenities(self):
+            """Returns the amenities of this Place"""
+            from models import storage
+            amenities_of_place = []
+            for value in storage.all(Amenity).values():
+                if value.id in self.amenity_ids:
+                    amenities_of_place.append(value)
+            return amenities_of_place
+
+        @amenities.setter
+        def amenities(self, value):
+            """Adds an amenity to this Place"""
+            if type(value) is Amenity:
+                if value.id not in self.amenity_ids:
+                    self.amenity_ids.append(value.id)
+
+        @property
+        def reviews(self):
+            """Returns the reviews of this Place"""
+            from models import storage
+            reviews_of_place = []
+            for value in storage.all(Review).values():
+                if value.place_id == self.id:
+                    reviews_of_place.append(value)
+            return reviews_of_place
 
     def __init__(self, *args, **kwargs):
         """
@@ -44,16 +79,3 @@ class Place(BaseModel,Base):
            and its purpose is to initialize the attributes of the object.
         """
         super().__init__(*args, **kwargs)
-
-    @property
-    def amenities(self):
-        """Getter attribute for amenities in FileStorage"""
-        # Assuming that amenities is a list of Amenity instances
-        return [Amenity(id=amenity_id) for amenity_id in self.amenity_ids]
-
-    @amenities.setter
-    def amenities(self, amenity):
-        """Setter attribute for amenities in FileStorage"""
-        # Accept only Amenity objects
-        if isinstance(amenity, Amenity):
-            self.amenity_ids.append(amenity.id)
