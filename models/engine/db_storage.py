@@ -7,6 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from models.base_model import BaseModel
 from models.state import State
 from models.city import City
+from models.user import User
 
 Base = declarative_base()
 
@@ -55,6 +56,7 @@ class DBStorage:
         from models.base_model import BaseModel
         from models.state import State
         from models.city import City
+        from models.user import User
 
         result = {}
         classes_to_query = [State, City] if cls is None else [cls]

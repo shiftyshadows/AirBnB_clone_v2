@@ -7,6 +7,7 @@ from sqlalchemy import Column, String, create_engine
 class User(BaseModel, Base):
     """ User class that inherits from BaseModel """
     __tablename__ = 'users'
+
     email = Column(String(128), nullable=False)
     password = Column(String(128), nullable=False)
     first_name = Column(String(128), nullable=True)
