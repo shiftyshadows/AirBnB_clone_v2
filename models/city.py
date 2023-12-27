@@ -20,9 +20,9 @@ class City(BaseModel, Base):
            It is automatically called when an instance of the class is created,
            and its purpose is to initialize the attributes of the object.
         """
-        super().__init__(*args, **kwargs)
+        self.name = kwargs.get('name',"-")
         self.state_id = kwargs.get('state_id', "")
-        self.name = kwargs.get('name', "")
+        super().__init__(*args, **kwargs)
 
 engine = create_engine("mysql+mysqldb://hbnb_dev:hbnb_dev_pwd@localhost/hbnb_dev_db", echo=False)
 Base.metadata.create_all(engine)
