@@ -7,7 +7,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 time_format = "%Y-%m-%dT%H:%M:%S.%f"
 
-Base=declarative_base()
+Base = declarative_base()
+
 
 class BaseModel:
     """ This class defines all common attributes/methods for other classes. """

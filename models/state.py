@@ -4,13 +4,14 @@ from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
+
 class State(BaseModel, Base):
     """Representation of state """
     __tablename__ = 'states'
     name = Column(String(128), nullable=False)
     # Define relationship to City
-    cities = relationship("City", back_populates="state", cascade="all, delete-orphan")
-
+    cities = relationship(
+        "City", back_populates="state", cascade="all, delete-orphan")
 
     def __init__(self, *args, **kwargs):
         """

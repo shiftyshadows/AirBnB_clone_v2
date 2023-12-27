@@ -10,9 +10,7 @@ class City(BaseModel, Base):
     __tablename__ = 'cities'
     name = Column(String(128), nullable=False)
     state_id = Column(String(60), ForeignKey('states.id'), nullable=False)
-    # Define relationship to State
     state = relationship("State", back_populates="cities")
-
 
     def __init__(self, *args, **kwargs):
         """
@@ -20,9 +18,10 @@ class City(BaseModel, Base):
            It is automatically called when an instance of the class is created,
            and its purpose is to initialize the attributes of the object.
         """
-#        self.name = kwargs.get('name')
         self.state_id = kwargs.get('state_id', "")
         super().__init__(*args, **kwargs)
 
-engine = create_engine("mysql+mysqldb://hbnb_dev:hbnb_dev_pwd@localhost/hbnb_dev_db", echo=False)
+
+engine = create_engine(
+    "mysql+mysqldb://hbnb_dev:hbnb_dev_pwd@localhost/hbnb_dev_db", echo=False)
 Base.metadata.create_all(engine)

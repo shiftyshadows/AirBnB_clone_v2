@@ -22,4 +22,3 @@ try:
     storage.reload()
 except Exception as e:
     print("Error on storage.reload")
-
