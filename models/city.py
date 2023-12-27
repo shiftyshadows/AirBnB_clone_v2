@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """ This module defines the class: City.  """
 from models.base_model import BaseModel, Base
-from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy import Column, String, ForeignKey, create_engine
 from sqlalchemy.orm import relationship
 
 
@@ -23,3 +23,6 @@ class City(BaseModel, Base):
         super().__init__(*args, **kwargs)
         self.state_id = kwargs.get('state_id', "")
         self.name = kwargs.get('name', "")
+
+engine = create_engine("mysql://hbnb_dev:hbnb_dev_pwd@localhost/hbnb_dev_db", echo=True)
+Base.metadata.create_all(engine)
