@@ -1,9 +1,12 @@
 #!/usr/bin/python3
 """This module defines the DBStorage Engine. """
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import sessionmaker, scoped_session, class_mapper
-from sqlalchemy.ext.declarative import declarative_base
 import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.ext.declarative import declarative_base
+from models.base_model import BaseModel
+from models.state import State
+from models.city import City
 
 Base=declarative_base()
 #os.environ["HBNB_MYSQL_USER"] = "hbnb_dev"
@@ -13,6 +16,9 @@ Base=declarative_base()
 #os.environ["HBNB_TYPE_STORAGE"] = "db"
 
 class DBStorage:
+    """
+       This class defines DBStrorage.
+    """
     __engine = None
     __session = None
 
@@ -23,22 +29,19 @@ class DBStorage:
            if the environment variable HBNB_ENV is equal to 'test'.
         """
 
-
+        dialect = 'mysql'
+        driver = 'mysqldb'
         user = os.environ.get('HBNB_MYSQL_USER')
         password = os.environ.get('HBNB_MYSQL_PWD')
         host = os.environ.get('HBNB_MYSQL_HOST', 'localhost')
         database = os.environ.get('HBNB_MYSQL_DB')
+        ppp = True
         env = os.environ.get('HBNB_ENV')
-        dialect = 'mysql'
-        driver = 'mysqldb'
-        ppp = True if os.environ.get('HBNB_ENV') == 'test' else False
 
-        connection_string = f'{dialect}+{driver}://{user}:{password}@{host}/{database}'
+        connection_string = "{}+{}://{}:{}@{}/{}".format(dialect, driver, user, password, host, database)
         self.__engine = create_engine(connection_string, pool_pre_ping=ppp)
         if env == 'test':
-            meta = MetaData(self.__engine)
-            meta.reflect()
-            meta.drop_all()
+            Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
         """Query on the current database session (self.__session) all objects
@@ -81,7 +84,14 @@ class DBStorage:
 
     def save(self):
         """Commit all changes of the current database session."""
-        self.__session.commit()
+        try:
+            self.__session.commit()
+        except Exception as e:
+            self.__session.rollback()
+            print(f"Error during commit: {e}")
+        finally:
+            self.__session.close()
+
 
     def delete(self, obj=None):
         """Delete obj from the current database session if not None."""
@@ -90,9 +100,6 @@ class DBStorage:
 
     def reload(self):
         """Create all tables in the database and create the current database session."""
-        from models.base_model import BaseModel
-        from models.state import State
-        from models.city import City
         Base.metadata.create_all(self.__engine)
         session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
         self.__session = scoped_session(session_factory)
@@ -100,4 +107,4 @@ class DBStorage:
     def close(self):
         """Close the current database session."""
         if self.__session:
-            self.__session.remove()
+            self.__session.close()
