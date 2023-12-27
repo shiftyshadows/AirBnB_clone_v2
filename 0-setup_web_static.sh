@@ -19,7 +19,6 @@ fi
 sudo mkdir -p /data/web_static/releases/test
 sudo cp index.html /data/web_static/releases/test
 sudo mkdir -p /data/web_static/shared/
-sudo mkdir -p /data/web_static/current/
 
 # Create symbolic link
 symbolic_link="/data/web_static/current"
