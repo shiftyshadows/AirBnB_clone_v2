@@ -33,7 +33,7 @@ class Place(BaseModel,Base):
     # Define the back-reference from Review to Place
     reviews = relationship('Review', back_populates='place', cascade='all, delete-orphan')
     # Define the Many-to-Many relationship with the Amenity class
-    amenities = relationship('Amenity', secondary=place_amenity, viewonly=False)
+    amenities = relationship('Amenity', secondary=place_amenity, back_populates='places', viewonly=False)
     # FileStorage Relationships (Getter and Setter)
     amenity_ids = []
 
