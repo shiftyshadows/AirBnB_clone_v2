@@ -8,6 +8,7 @@ from models.base_model import BaseModel
 from models.state import State
 from models.city import City
 from models.user import User
+from models.place import Place
 
 Base = declarative_base()
 
@@ -53,13 +54,8 @@ class DBStorage:
                 key = <class-name>.<object-id>
                 value = object
         """
-#        from models.base_model import BaseModel
-#        from models.state import State
-#        from models.city import City
-#        from models.user import User
-
         result = {}
-        classes_to_query = [State, City, User] if cls is None else [cls]
+        classes_to_query = [State, City, User, Place] if cls is None else [cls]
 
         for model_class in classes_to_query:
             model_name = model_class.__name__

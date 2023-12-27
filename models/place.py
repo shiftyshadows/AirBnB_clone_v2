@@ -1,21 +1,26 @@
 #!/usr/bin/python3
 """ This module defines the class: Place.  """
-from models.base_model import BaseModel
+from models.base_model import BaseModel, Base
+from sqlalchemy import Column, String, Integer, Float, ForeignKey, create_engine
+from sqlalchemy.orm import relationship
 
-
-class Place(BaseModel):
+class Place(BaseModel,Base):
     """Representation of Place """
-    city_id = ""
-    user_id = ""
-    name = ""
-    description = ""
-    number_rooms = 0
-    number_bathrooms = 0
-    max_guest = 0
-    price_by_night = 0
-    latitude = 0.0
-    longitude = 0.0
-    amenity_ids = []
+    __tablename__ = 'places'
+    city_id = Column(String(60), ForeignKey('cities.id'), nullable=False)
+    user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
+    name = Column(String(128), nullable=False)
+    description = Column(String(1024), nullable=True)
+    number_rooms = Column(Integer, nullable=False, default=0)
+    number_bathrooms = Column(Integer, nullable=False, default=0)
+    max_guest = Column(Integer, nullable=False, default=0)
+    price_by_night = Column(Integer, nullable=False, default=0)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
+    # Define the back-reference from Place to User
+    user = relationship('User', back_populates='places')
+    # Define the back-reference from Place to City
+    city = relationship('City', back_populates='places')
 
     def __init__(self, *args, **kwargs):
         """
@@ -24,3 +29,7 @@ class Place(BaseModel):
            and its purpose is to initialize the attributes of the object.
         """
         super().__init__(*args, **kwargs)
+
+engine = create_engine(
+    "mysql+mysqldb://hbnb_dev:hbnb_dev_pwd@localhost/hbnb_dev_db", echo=False)
+Base.metadata.create_all(engine)
