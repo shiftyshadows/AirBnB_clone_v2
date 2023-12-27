@@ -1,8 +1,17 @@
 #!/usr/bin/python3
 """ This module defines the class: Place.  """
 from models.base_model import BaseModel, Base
-from sqlalchemy import Column, String, Integer, Float, ForeignKey
+from sqlalchemy import Column, String, Integer, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship
+
+# Define the association table for the Many-to-Many relationship
+place_amenity = Table(
+    'place_amenity',
+    Base.metadata,
+    Column('place_id', String(60), ForeignKey('places.id'), primary_key=True, nullable=False),
+    Column('amenity_id', String(60), ForeignKey('amenities.id'), primary_key=True, nullable=False)
+)
+
 
 class Place(BaseModel,Base):
     """Representation of Place """
@@ -23,6 +32,11 @@ class Place(BaseModel,Base):
     city = relationship('City', back_populates='places')
     # Define the back-reference from Review to Place
     reviews = relationship('Review', back_populates='place', cascade='all, delete-orphan')
+    # Define the Many-to-Many relationship with the Amenity class
+    amenities = relationship('Amenity', secondary=place_amenity, viewonly=False)
+    # FileStorage Relationships (Getter and Setter)
+    amenity_ids = []
+
     def __init__(self, *args, **kwargs):
         """
            This class method that serves as the constructor for the class.
@@ -30,3 +44,16 @@ class Place(BaseModel,Base):
            and its purpose is to initialize the attributes of the object.
         """
         super().__init__(*args, **kwargs)
+
+    @property
+    def amenities(self):
+        """Getter attribute for amenities in FileStorage"""
+        # Assuming that amenities is a list of Amenity instances
+        return [Amenity(id=amenity_id) for amenity_id in self.amenity_ids]
+
+    @amenities.setter
+    def amenities(self, amenity):
+        """Setter attribute for amenities in FileStorage"""
+        # Accept only Amenity objects
+        if isinstance(amenity, Amenity):
+            self.amenity_ids.append(amenity.id)
