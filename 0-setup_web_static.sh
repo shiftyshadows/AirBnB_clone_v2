@@ -30,8 +30,9 @@ sudo chown -R ubuntu:ubuntu /data/
 
 #Update the Nginx configuration
 nginx_config="/etc/nginx/sites-available/default"
-symbolic_link="/data/web_static/current"
 cat nginx_configuration |sudo tee "$nginx_config" > /dev/null
+sudo nginx -c "$nginx_config"
+sudo nginx -s reload
 
 # Restart Nginx
 sudo service nginx restart
