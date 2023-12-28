@@ -1,0 +1,22 @@
+error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
+
+events {
+    # Default event-related configurations
+}
+
+http {
+    server {
+        listen 80;
+        server_name 54.198.34.62;
+
+        location /hbnb_static {
+            alias $symbolic_link/;
+            index index.html index.htm;
+        }
+
+        location / {
+            try_files \$uri \$uri/ =404;
+        }
+    }
+}

@@ -31,20 +31,7 @@ sudo chown -R ubuntu:ubuntu /data/
 #Update the Nginx configuration
 nginx_config="/etc/nginx/sites-available/default"
 symbolic_link="/data/web_static/current"
-echo "
-server {
-    listen 80;
-    server_name _;
-
-    location /hbnb_static {
-        alias $symbolic_link/;
-        index index.html index.htm;
-    }
-
-    location / {
-        try_files \$uri \$uri/ =404;
-    }
-}" | sudo tee "$nginx_config" > /dev/null
+cat nginx_configuration |sudo tee "$nginx_config" > /dev/null
 
 # Restart Nginx
 sudo service nginx restart
