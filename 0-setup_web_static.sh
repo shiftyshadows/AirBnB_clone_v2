@@ -19,6 +19,8 @@ fi
 sudo mkdir -p /data/web_static/releases/test
 sudo cp index.html /data/web_static/releases/test
 sudo mkdir -p /data/web_static/shared/
+sudo mkdir -p /var/run/nginx
+sudo chmod -R 755 /var/run/nginx
 
 # Create symbolic link
 symbolic_link="/data/web_static/current"
@@ -31,5 +33,8 @@ sudo chown -R ubuntu:ubuntu /data/
 #Update the Nginx configuration
 nginx_config="/etc/nginx/sites-available/default"
 sudo cp nginx_configuration "$nginx_config"
-sudo nginx -c "$nginx_config"
+#sudo nginx -c "$nginx_config"
 sudo nginx -s reload
+
+# Restart Nginx
+sudo service nginx restart
