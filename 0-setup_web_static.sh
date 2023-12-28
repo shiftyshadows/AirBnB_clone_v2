@@ -16,11 +16,22 @@ then
 fi
 
 #Create folders
-sudo mkdir -p /data/web_static/releases/test
+directories=(
+    "/data/web_static/releases/test"
+    "/data/web_static/shared"
+    "/var/run/nginx"
+    "/var/www/html"
+    "/etc/nginx/site-available/"
+)
+for dir in "${directories[@]}"; do
+    if [ ! -d "$dir" ]; then
+        sudo mkdir -p "$dir"
+    else
+        echo "Directory already exists: $dir"
+    fi
+done
 sudo cp index.html /data/web_static/releases/test
-sudo mkdir -p /data/web_static/shared/
-sudo mkdir -p /var/run/nginx
-sudo chmod -R 755 /var/run/nginx
+sudo chmod -R 755 /var/run/nginx /var/run/nginx /etc/nginx/site-available/
 
 # Create symbolic link
 symbolic_link="/data/web_static/current"
@@ -31,10 +42,10 @@ sudo ln -sf "$target_folder" "$symbolic_link"
 sudo chown -R ubuntu:ubuntu /data/
 
 #Update the Nginx configuration
-nginx_config="/etc/nginx/sites-available/default"
+nginx_config="/etc/nginx/site-available/default"
 sudo cp nginx_configuration "$nginx_config"
-#sudo nginx -c "$nginx_config"
 sudo nginx -s reload
+sudo nginx -c "$nginx_config"
 
 # Restart Nginx
 sudo service nginx restart

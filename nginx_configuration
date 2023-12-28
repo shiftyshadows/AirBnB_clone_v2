@@ -8,7 +8,12 @@ events {
 http {
     server {
         listen 80;
-        server_name 54.198.34.62;
+        server_name 100.26.53.148;
+
+        location / {
+            root /var/www/html/;
+            index index.html;
+        }
 
         location /redirect_me {
             return 301 https://www.example.com/;
@@ -16,7 +21,7 @@ http {
 
         location /hbnb_static/ {
             alias /data/web_static/current/;
-            index index.html;
+            autoindex off;
         }
 
         error_page 404 /404.html;
