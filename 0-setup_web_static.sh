@@ -69,7 +69,7 @@ for dir in "${directories[@]}"; do
         echo "Directory already exists: $dir"
     fi
 done
-echo -e '$HTML_HOME' /data/web_static/releases/test/index.html
+echo -e '$HTML_HOME' | tee /data/web_static/releases/test/index.html
 sudo chmod -R 755 /var/run/nginx /var/run/nginx /etc/nginx/site-available/
 
 # Create symbolic link
@@ -83,8 +83,14 @@ sudo chown -R ubuntu:ubuntu /data/
 #Update the Nginx configuration
 nginx_config="/etc/nginx/site-available/default"
 echo -e '$SERVER_CONFIG'| sudo tee "$nginx_config"
-sudo nginx -c "$nginx_config"
-sudo nginx -s reload
+#sudo nginx -c "$nginx_config"
+#sudo nginx -s reload
+
+if [ "$(pgrep -c nginx)" -le 0 ]; then
+	service nginx start
+else
+	service nginx restart
+fi
 
 # Restart Nginx
 sudo service nginx restart
