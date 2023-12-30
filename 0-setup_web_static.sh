@@ -102,4 +102,4 @@ echo -e "$SERVER_CONFIG"| sudo tee "$nginx_config" > /dev/null
 sudo nginx -c "$nginx_config" -s reload
 
 # Restart Nginx
-#sudo service nginx restart
+sudo service nginx restart
