@@ -1,31 +1,46 @@
 #!/usr/bin/env bash
 #Script that sets up your web servers for the deployment of web_static
 
-SERVER_CONFIG="server {
-    listen 80;
-    server_name 100.26.53.148;
+SERVER_CONFIG="user nginx;
+worker_processes auto;
 
-    location / {
-        root /var/www/html/;
-        index index.html;
-    }
+error_log /var/log/nginx/error.log notice;
+pid /var/run/nginx.pid;
 
-    location /redirect_me {
-        return 301 https://www.example.com/;
-    }
-
-    location /hbnb_static/ {
-        alias /data/web_static/current/;
-        autoindex off;
-    }
-
-    error_page 404 /404.html;
-    location = /404.html {
-        root /var/www/html;
-        internal;
-    }
+events {
+    worker_connections 1024;    # Default event-related configurations
 }
-"
+
+http {
+    server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+        server_name _;
+        index index.html index.htm;
+        error_page 404 /404.html;
+        add_header X-Served-By \$hostname;
+
+        location / {
+            root /var/www/html/;
+            try_files \$uri \$uri/ =404;
+        }
+
+        location /redirect_me {
+            return 301 https://www.example.com/;
+        }
+
+        location /hbnb_static/ {
+            alias /data/web_static/current/;
+            try_files \$uri \$uri/ =404;
+        }
+
+        location = /404.html {
+            root /var/www/html;
+            internal;
+        }
+    }
+}"
 
 HTML_HOME="<!-- index.html -->
 <!DOCTYPE html>
@@ -60,6 +75,7 @@ directories=(
     "/data/web_static/shared"
     "/var/run/nginx"
     "/var/www/html"
+    "/var/www/error"
     "/etc/nginx/site-available/"
 )
 for dir in "${directories[@]}"; do
@@ -69,8 +85,8 @@ for dir in "${directories[@]}"; do
         echo "Directory already exists: $dir"
     fi
 done
-echo -e '$HTML_HOME' | tee /data/web_static/releases/test/index.html
-sudo chmod -R 755 /var/run/nginx /var/run/nginx /etc/nginx/site-available/
+echo -e "$HTML_HOME" | tee /data/web_static/releases/test/index.html > /dev/null
+sudo chmod -R 755 /var/www /var/run/nginx /etc/nginx/site-available/
 
 # Create symbolic link
 symbolic_link="/data/web_static/current"
@@ -82,15 +98,8 @@ sudo chown -R ubuntu:ubuntu /data/
 
 #Update the Nginx configuration
 nginx_config="/etc/nginx/site-available/default"
-echo -e '$SERVER_CONFIG'| sudo tee "$nginx_config"
-#sudo nginx -c "$nginx_config"
-#sudo nginx -s reload
-
-if [ "$(pgrep -c nginx)" -le 0 ]; then
-	service nginx start
-else
-	service nginx restart
-fi
+echo -e "$SERVER_CONFIG"| sudo tee "$nginx_config" > /dev/null
+sudo nginx -c "$nginx_config" -s reload
 
 # Restart Nginx
-sudo service nginx restart
+#sudo service nginx restart
