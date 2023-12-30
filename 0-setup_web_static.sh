@@ -1,5 +1,44 @@
 #!/usr/bin/env bash
 #Script that sets up your web servers for the deployment of web_static
+
+SERVER_CONFIG="server {
+    listen 80;
+    server_name 100.26.53.148;
+
+    location / {
+        root /var/www/html/;
+        index index.html;
+    }
+
+    location /redirect_me {
+        return 301 https://www.example.com/;
+    }
+
+    location /hbnb_static/ {
+        alias /data/web_static/current/;
+        autoindex off;
+    }
+
+    error_page 404 /404.html;
+    location = /404.html {
+        root /var/www/html;
+        internal;
+    }
+}
+"
+
+HTML_HOME="<!-- index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hello World!</title>
+</head>
+<body>
+    <h1>Hello World!</h1>
+</body>
+</html>
+"
+
 # Install Nginx if not already installed
 if ! command -v nginx &> /dev/null
 then
@@ -43,7 +82,7 @@ sudo chown -R ubuntu:ubuntu /data/
 
 #Update the Nginx configuration
 nginx_config="/etc/nginx/site-available/default"
-sudo cp nginx_configuration "$nginx_config"
+echo -e '$SERVER_CONFIG'| sudo tee "$nginx_config"
 sudo nginx -s reload
 sudo nginx -c "$nginx_config"
 
