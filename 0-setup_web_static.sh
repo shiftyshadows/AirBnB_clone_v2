@@ -1,44 +1,30 @@
 #!/usr/bin/env bash
 #Script that sets up your web servers for the deployment of web_static
 
-SERVER_CONFIG="user nginx;
-worker_processes auto;
+SERVER_CONFIG="server {
+    listen 80 default_server;
+    server_name _;
 
-error_log /var/log/nginx/error.log notice;
-pid /var/run/nginx.pid;
+    root /data/web_static/releases/test;
+    error_page 404 /404.html;
+    add_header X-Served-By \$hostname;
 
-events {
-    worker_connections 1024;    # Default event-related configurations
-}
-
-http {
-    server {
-        listen 80 default_server;
-        listen [::]:80 default_server;
-
-        server_name _;
+    location / {
         index index.html index.htm;
-        error_page 404 /404.html;
-        add_header X-Served-By \$hostname;
+    }
 
-        location / {
-            root /var/www/html/;
-            try_files \$uri \$uri/ =404;
-        }
+    location /redirect_me {
+        return 301 http://cuberule.com/;
+    }
 
-        location /redirect_me {
-            return 301 https://www.example.com/;
-        }
+    location /hbnb_static/ {
+        alias \$symbolic_link;
+        index index.html index.htm;
+    }
 
-        location /hbnb_static/ {
-            alias /data/web_static/current/;
-            try_files \$uri \$uri/ =404;
-        }
-
-        location = /404.html {
-            root /var/www/html;
-            internal;
-        }
+    location = /404.html {
+        root /var/www/html;
+        internal;
     }
 }"
 
@@ -57,16 +43,23 @@ HTML_HOME="<!-- index.html -->
 # Install Nginx if not already installed
 if ! command -v nginx &> /dev/null
 then
-    # Update source list
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/ubuntu/ focal nginx" | sudo tee /etc/apt/sources.list.d/nginx.list
-    echo "deb-src [arch=amd64 signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/ubuntu/ focal nginx" | sudo tee -a /etc/apt/sources.list.d/nginx.list
+    # Install Prerequisites
+    sudo apt install curl gnupg2 ca-certificates lsb-release ubuntu-keyring
     # Recieve signing keys
-    sudo gpg --keyserver keyserver.ubuntu.com --recv-keys ABF5BD827BD9BF62
-    sudo gpg --export --armor ABF5BD827BD9BF62 | sudo gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg
+    curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+#    sudo gpg --keyserver keyserver.ubuntu.com --recv-keys ABF5BD827BD9BF62
+#    sudo gpg --export --armor ABF5BD827BD9BF62 | sudo gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg
+    # Update source list
+    OS=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
+    RELEASE=$(lsb_release -cs)
+    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/${OS} ${RELEASE} nginx" | sudo tee /etc/apt/sources.list.d/nginx.list
+    echo "deb-src [arch=amd64 signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/${OS} ${RELEASE} nginx" | sudo tee -a /etc/apt/sources.list.d/nginx.list
+    # Set up repository pinning
+    echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | sudo tee /etc/apt/preferences.d/99nginx
     # Update package list
-    sudo apt-get update
+    sudo apt update
     # Install nginx
-    sudo apt-get install -y nginx
+    sudo apt install -y nginx
 fi
 
 #Create folders
@@ -74,9 +67,6 @@ directories=(
     "/data/web_static/releases/test"
     "/data/web_static/shared"
     "/var/run/nginx"
-    "/var/www/html"
-    "/var/www/error"
-    "/etc/nginx/site-available/"
 )
 for dir in "${directories[@]}"; do
     if [ ! -d "$dir" ]; then
@@ -85,21 +75,21 @@ for dir in "${directories[@]}"; do
         echo "Directory already exists: $dir"
     fi
 done
+#Give ownership of the /data/ folder to the ubuntu user AND group
+sudo chown -R ubuntu:ubuntu /data/
+
 echo -e "$HTML_HOME" | tee /data/web_static/releases/test/index.html > /dev/null
-sudo chmod -R 755 /var/www /var/run/nginx /etc/nginx/site-available/
+sudo chmod -R 755 /var/run/nginx /data
 
 # Create symbolic link
 symbolic_link="/data/web_static/current"
 target_folder="/data/web_static/releases/test/"
 sudo ln -sf "$target_folder" "$symbolic_link"
 
-#Give ownership of the /data/ folder to the ubuntu user AND group
-sudo chown -R ubuntu:ubuntu /data/
-
 #Update the Nginx configuration
-nginx_config="/etc/nginx/site-available/default"
+nginx_config="/etc/nginx/conf.d/hbnb.conf"
 echo -e "$SERVER_CONFIG"| sudo tee "$nginx_config" > /dev/null
-sudo nginx -c "$nginx_config" -s reload
+sudo nginx -s reload
 
 # Restart Nginx
 sudo service nginx restart
