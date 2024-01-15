@@ -57,7 +57,8 @@ class DBStorage:
                 value = object
         """
         result = {}
-        classes_to_query = [State, City, User, Place, Review, Amenity] if cls is None else [cls]
+        classes_to_query = [State, City, User, Place, Review, Amenity] \
+            if cls is None else [cls]
 
         for model_class in classes_to_query:
             model_name = model_class.__name__
