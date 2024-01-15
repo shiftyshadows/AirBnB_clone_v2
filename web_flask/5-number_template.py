@@ -1,52 +1,53 @@
 #!/usr/bin/python3
-""" This module defines a script that starts a Flask web application."""
-from flask import Flask, escape, render_template
+'''A simple Flask web application.
+'''
+from flask import Flask, render_template
+
 
 app = Flask(__name__)
+'''The Flask application instance.'''
+app.url_map.strict_slashes = False
 
 
-@app.route('/', strict_slashes=False)
-# Route for the root path
-def hello_hbnb():
+@app.route('/')
+def index():
+    '''The home page.'''
     return 'Hello HBNB!'
 
 
-@app.route('/hbnb', strict_slashes=False)
-# Route for the /hbnb path
+@app.route('/hbnb')
 def hbnb():
+    '''The hbnb page.'''
     return 'HBNB'
 
 
-@app.route('/c/<text>', strict_slashes=False)
-# Route for the /c/<text> path
-def custom_text(text):
-    # Replace underscore symbols with a space
-    text = escape(text).replace('_', ' ')
-    return 'C {}'.format(text)
+@app.route('/c/<text>')
+def c_page(text):
+    '''The c page.'''
+    return 'C {}'.format(text.replace('_', ' '))
 
 
-@app.route('/python/', defaults={'text': 'is cool'}, strict_slashes=False)
-# Route for the /python/<text> path with default value "is cool"
-@app.route('/python/<text>', strict_slashes=False)
-def python_text(text):
-    # Replace underscore symbols with a space
-    text = escape(text).replace('_', ' ')
-    return 'Python {}'.format(text)
+@app.route('/python/<text>')
+@app.route('/python', defaults={'text': 'is cool'})
+def python_page(text):
+    '''The python page.'''
+    return 'Python {}'.format(text.replace('_', ' '))
 
 
-@app.route('/number/<int:n>', strict_slashes=False)
-# Route for the /number/<n> path
-def show_number(n):
+@app.route('/number/<int:n>')
+def number_page(n):
+    '''The number page.'''
     return '{} is a number'.format(n)
 
 
-@app.route('/number_template/<int:n>', strict_slashes=False)
-# Route for the /number_template/<n> path
+@app.route('/number_template/<int:n>')
 def number_template(n):
-    # Display an HTML page if n is an integer
-    return render_template('number_template.html', number=n)
+    '''The number_template page.'''
+    ctxt = {
+        'n': n
+    }
+    return render_template('5-number.html', **ctxt)
 
 
 if __name__ == '__main__':
-    # Run the Flask app on 0.0.0.0, port 5000
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port='5000')
