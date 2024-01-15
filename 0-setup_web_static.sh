@@ -1,95 +1,62 @@
 #!/usr/bin/env bash
-#Script that sets up your web servers for the deployment of web_static
-
+# Installs, configures, and starts the web server
 SERVER_CONFIG="server {
-    listen 80 default_server;
-    server_name _;
+	listen 80 default_server;
+	listen [::]:80 default_server;
 
-    root /data/web_static/releases/test;
-    error_page 404 /404.html;
-    add_header X-Served-By \$hostname;
+	server_name _;
+	index index.html index.htm;
+	error_page 404 /404.html;
+	add_header X-Served-By \$hostname;
 
-    location / {
-        index index.html index.htm;
-    }
+	location / {
+		root /var/www/html/;
+		try_files \$uri \$uri/ =404;
+	}
 
-    location /redirect_me {
-        return 301 http://cuberule.com/;
-    }
+	location /hbnb_static/ {
+		alias /data/web_static/current/;
+		try_files \$uri \$uri/ =404;
+	}
 
-    location /hbnb_static/ {
-        alias \$symbolic_link;
-        index index.html index.htm;
-    }
+	if (\$request_filename ~ redirect_me) {
+		rewrite ^ https://sketchfab.com/bluepeno/models permanent;
+	}
 
-    location = /404.html {
-        root /var/www/html;
-        internal;
-    }
+	location = /404.html {
+		root /var/www/error/;
+		internal;
+	}
 }"
-
-HTML_HOME="<!-- index.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Hello World!</title>
-</head>
-<body>
-    <h1>Hello World!</h1>
-</body>
+HOME_PAGE="<!DOCTYPE html>
+<html lang='en-US'>
+	<head>
+		<title>Home - AirBnB Clone</title>
+	</head>
+	<body>
+		<h1>Welcome to AirBnB!</h1>
+	<body>
 </html>
 "
-
-# Install Nginx if not already installed
-if ! command -v nginx &> /dev/null
-then
-    # Install Prerequisites
-    sudo apt install curl gnupg2 ca-certificates lsb-release ubuntu-keyring
-    # Recieve signing keys
-    curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
-#    sudo gpg --keyserver keyserver.ubuntu.com --recv-keys ABF5BD827BD9BF62
-#    sudo gpg --export --armor ABF5BD827BD9BF62 | sudo gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg
-    # Update source list
-    OS=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
-    RELEASE=$(lsb_release -cs)
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/${OS} ${RELEASE} nginx" | sudo tee /etc/apt/sources.list.d/nginx.list
-    echo "deb-src [arch=amd64 signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/${OS} ${RELEASE} nginx" | sudo tee -a /etc/apt/sources.list.d/nginx.list
-    # Set up repository pinning
-    echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | sudo tee /etc/apt/preferences.d/99nginx
-    # Update package list
-    sudo apt update
-    # Install nginx
-    sudo apt install -y nginx
+# shellcheck disable=SC2230
+if [[ "$(which nginx | grep -c nginx)" == '0' ]]; then
+    apt-get update
+    apt-get -y install nginx
 fi
+mkdir -p /var/www/html /var/www/error
+chmod -R 755 /var/www
+echo 'Hello World!' > /var/www/html/index.html
+echo -e "Ceci n\x27est pas une page" > /var/www/error/404.html
 
-#Create folders
-directories=(
-    "/data/web_static/releases/test"
-    "/data/web_static/shared"
-    "/var/run/nginx"
-)
-for dir in "${directories[@]}"; do
-    if [ ! -d "$dir" ]; then
-        sudo mkdir -p "$dir"
-    else
-        echo "Directory already exists: $dir"
-    fi
-done
-#Give ownership of the /data/ folder to the ubuntu user AND group
-sudo chown -R ubuntu:ubuntu /data/
-
-echo -e "$HTML_HOME" | tee /data/web_static/releases/test/index.html > /dev/null
-sudo chmod -R 755 /var/run/nginx /data
-
-# Create symbolic link
-symbolic_link="/data/web_static/current"
-target_folder="/data/web_static/releases/test/"
-sudo ln -sf "$target_folder" "$symbolic_link"
-
-#Update the Nginx configuration
-nginx_config="/etc/nginx/conf.d/hbnb.conf"
-echo -e "$SERVER_CONFIG"| sudo tee "$nginx_config" > /dev/null
-sudo nginx -s reload
-
-# Restart Nginx
-sudo service nginx restart
+mkdir -p /data/web_static/releases/test /data/web_static/shared
+echo -e "$HOME_PAGE" > /data/web_static/releases/test/index.html
+[ -d /data/web_static/current ] && rm -rf /data/web_static/current
+ln -sf /data/web_static/releases/test/ /data/web_static/current
+chown -hR ubuntu:ubuntu /data
+bash -c "echo -e '$SERVER_CONFIG' > /etc/nginx/sites-available/default"
+ln -sf '/etc/nginx/sites-available/default' '/etc/nginx/sites-enabled/default'
+if [ "$(pgrep -c nginx)" -le 0 ]; then
+	service nginx start
+else
+	service nginx restart
+fi
