@@ -39,16 +39,45 @@ HOME_PAGE="<!DOCTYPE html>
 </html>
 "
 # shellcheck disable=SC2230
-if [[ "$(which nginx | grep -c nginx)" == '0' ]]; then
-    apt-get update
-    apt-get -y install nginx
+if ! command -v nginx &> /dev/null
+then
+    # Install Prerequisites
+    sudo apt install curl gnupg2 ca-certificates lsb-release ubuntu-keyring
+    # Recieve signing keys
+    curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+#    sudo gpg --keyserver keyserver.ubuntu.com --recv-keys ABF5BD827BD9BF62
+#    sudo gpg --export --armor ABF5BD827BD9BF62 | sudo gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg
+    # Update source list
+    OS=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
+    RELEASE=$(lsb_release -cs)
+    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/${OS} ${RELEASE} nginx" | sudo tee /etc/apt/sources.list.d/nginx.list
+    echo "deb-src [arch=amd64 signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/${OS} ${RELEASE} nginx" | sudo tee -a /etc/apt/sources.list.d/nginx.list
+    # Set up repository pinning
+    echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | sudo tee /etc/apt/preferences.d/99nginx
+    # Update package list
+    sudo apt update
+    # Install nginx
+    sudo apt install -y nginx
 fi
-sudo mkdir -p /var/www/html /var/www/error
+
+#Create folders
+directories=(
+    "/data/web_static/releases/test"
+    "/data/web_static/shared"
+    "/var/www/html"
+    "/var/www/error"
+)
+for dir in "${directories[@]}"; do
+    if [ ! -d "$dir" ]; then
+        sudo mkdir -p "$dir"
+    else
+        echo "Directory already exists: $dir"
+    fi
+done
 sudo chmod -R 755 /var/www
 echo 'Hello World!' | sudo tee /var/www/html/index.html
 echo -e "Ceci n\x27est pas une page" | sudo tee /var/www/error/404.html
 
-sudo mkdir -p /data/web_static/releases/test /data/web_static/shared
 echo -e "$HOME_PAGE" | sudo tee /data/web_static/releases/test/index.html
 [ -d /data/web_static/current ] && rm -rf /data/web_static/current
 sudo ln -sf /data/web_static/releases/test/ /data/web_static/current

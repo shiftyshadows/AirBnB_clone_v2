@@ -88,8 +88,12 @@ sudo ln -sf "$target_folder" "$symbolic_link"
 
 #Update the Nginx configuration
 nginx_config="/etc/nginx/conf.d/hbnb.conf"
+sudo rm /etc/nginx/conf.d/*
 echo -e "$SERVER_CONFIG"| sudo tee "$nginx_config" > /dev/null
 sudo nginx -s reload
 
-# Restart Nginx
-sudo service nginx restart
+if [ "$(pgrep -c nginx)" -le 0 ]; then
+        sudo service nginx start
+else
+        sudo service nginx restart
+fi
