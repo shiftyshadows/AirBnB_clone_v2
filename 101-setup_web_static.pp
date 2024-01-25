@@ -110,7 +110,6 @@ exec { 'start-nginx':
   command => 'sudo service nginx restart',
   path    => '/usr/bin:/usr/sbin:/bin',
   require => [
-    Exec['enable-site'],
     Package['nginx'],
     File['/data/web_static/releases/test/index.html'],
   ],
