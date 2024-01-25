@@ -74,27 +74,29 @@ file { '/etc/nginx/sites-available/default':
   mode    => '0644',
   content =>
 "server {
-	listen 80 default_server;
-	listen [::]:80 default_server;
-	server_name _;
-	index index.html index.htm;
-	error_page 404 /404.html;
-	add_header X-Served-By \$hostname;
-	location / {
-		root /var/www/html/;
-		try_files \$uri \$uri/ =404;
-	}
-	location /hbnb_static/ {
-		alias /data/web_static/current/;
-		try_files \$uri \$uri/ =404;
-	}
-	if (\$request_filename ~ redirect_me){
-		rewrite ^ https://sketchfab.com/bluepeno/models permanent;
-	}
-	location = /404.html {
-		root /var/www/error/;
-		internal;
-	}
+        server_name _;
+        index index.html index.htm;
+        error_page 404 /404.html;
+        add_header X-Served-By \$hostname;
+
+        location / {
+            root /data/web_static/current/;
+            try_files \$uri \$uri/ =404;
+        }
+
+        location /redirect_me {
+            return 301 http://cuberule.com/;
+        }
+
+        location /hbnb_static/ {
+            alias /data/web_static/current/;
+            index index.html;
+        }
+
+        location = /404.html {
+            root /var/www/html;
+            internal;
+        }
 }",
   require => [
     Package['nginx'],
@@ -102,12 +104,6 @@ file { '/etc/nginx/sites-available/default':
     File['/var/www/error/404.html'],
     Exec['change-data-owner']
   ],
-}
-
-exec { 'enable-site':
-  command => "ln -sf '/etc/nginx/sites-available/default' '/etc/nginx/sites-enabled/default'",
-  path    => '/usr/bin:/usr/sbin:/bin',
-  require => File['/etc/nginx/sites-available/default'],
 }
 
 exec { 'start-nginx':
