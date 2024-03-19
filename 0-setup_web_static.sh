@@ -1,6 +1,42 @@
 #!/usr/bin/env bash
 # Installs, configures, and starts the web server
-SERVER_CONFIG="server {
+SERVER_CONFIG="error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
+
+events {
+    # Default event-related configurations
+}
+
+http {
+    server {
+        listen 80;
+
+        server_name _;
+        index index.html index.htm;
+        error_page 404 /404.html;
+        add_header X-Served-By \$hostname;
+
+        location / {
+                root /var/www/html/;
+                try_files \$uri \$uri/ =404;
+        }
+
+        location /hbnb_static/ {
+                alias /data/web_static/current/;
+                try_files \$uri \$uri/ =404;
+        }
+
+        if (\$request_filename ~ redirect_me) {
+                rewrite ^ https://sketchfab.com/bluepeno/models permanent;
+        }
+
+        location = /404.html {
+                root /var/www/error/;
+                internal;
+        }
+    }
+}"
+SERVER_CONFIG_2="server {
         listen 80 default_server;
         listen [::]:80 default_server;
 
@@ -83,9 +119,6 @@ echo -e "$HOME_PAGE" | sudo tee /data/web_static/releases/test/index.html
 sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
 sudo chown -hR ubuntu:ubuntu /data
 bash -c "echo -e '$SERVER_CONFIG' | sudo  tee /etc/nginx/sites-available/default"
-sudo ln -sf '/etc/nginx/sites-available/default' '/etc/nginx/sites-enabled/default'
-if [ "$(pgrep -c nginx)" -le 0 ]; then
-        sudo service nginx start
-else
-        sudo service nginx restart
-fi
+sudo nginx -c /etc/nginx/sites-available/default
+# Reload nginx configuration
+sudo nginx -s reload
