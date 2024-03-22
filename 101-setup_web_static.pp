@@ -132,6 +132,9 @@ exec { 'reload_nginx':
   command => 'nginx -s reload',
   path    => '/usr/sbin:/usr/bin:/bin',
   refreshonly => true,
+  require => [
+    Exec['start_nginx']
+  ]
 }
 
 Exec['reload-nginx']
