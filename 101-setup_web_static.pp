@@ -1,117 +1,91 @@
-#!/usr/bin/puppet apply
-# AirBnB clone web server setup and configuration
-# Install nginx package
-package { 'nginx':
-    ensure => installed,
-}
+# Configures a web server for deployment of web_static.
 
-# Define nginx service
-service { 'nginx':
-    ensure  => running,
-    enable  => true,
-    require => Package['nginx'],
-}
+# Nginx configuration file
+$nginx_conf = "server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    add_header X-Served-By ${hostname};
+    root   /var/www/html;
+    index  index.html index.htm;
 
-# Define nginx server configuration
-file { '/etc/nginx/sites-available/default':
-    ensure  => file,
-    content => "error_log  /var/log/nginx/error.log notice;
-pid        /var/run/nginx.pid;
-
-events {
-    # Default event-related configurations
-}
-
-http {
-    server {
-        listen 80;
-
-        server_name _;
+    location /hbnb_static {
+        alias /data/web_static/current;
         index index.html index.htm;
-        error_page 404 /404.html;
-        add_header X-Served-By \$hostname;
-
-        location / {
-                root /var/www/html/;
-                try_files \$uri \$uri/ =404;
-        }
-
-        location /hbnb_static/ {
-                alias /data/web_static/current/;
-                try_files \$uri \$uri/ =404;
-        }
-
-        if (\$request_filename ~ redirect_me) {
-                rewrite ^ https://sketchfab.com/bluepeno/models permanent;
-        }
-
-        location = /404.html {
-                root /var/www/error/;
-                internal;
-        }
     }
-}",
-    require => Package['nginx'],
-    notify  => Service['nginx'],
-}
 
-# Create directories
-$directories = [
-    '/data/web_static/releases/test',
-    '/data/web_static/shared',
-    '/var/www/html',
-    '/var/www/error',
-]
+    location /redirect_me {
+        return 301 http://cuberule.com/;
+    }
 
-# Ensure directories are present
-ensure_resource('file', $directories, { ensure => directory })
+    error_page 404 /404.html;
+    location /404 {
+      root /var/www/html;
+      internal;
+    }
+}"
 
-# Set permissions
-file { '/var/www':
-    ensure  => directory,
-    mode    => '0755',
-    recurse => true,
-    owner   => 'ubuntu',
-    group   => 'ubuntu',
-}
+package { 'nginx':
+  ensure   => 'present',
+  provider => 'apt'
+} ->
 
-# Define default index.html
-file { '/var/www/html/index.html':
-    ensure  => file,
-    content => 'Hello World!',
-    owner   => 'ubuntu',
-    group   => 'ubuntu',
-}
+file { '/data':
+  ensure  => 'directory'
+} ->
 
-# Define 404.html
-file { '/var/www/error/404.html':
-    ensure  => file,
-    content => "Ceci n'est pas une page",
-    owner   => 'ubuntu',
-    group   => 'ubuntu',
-}
+file { '/data/web_static':
+  ensure => 'directory'
+} ->
 
-# Define symbolic link for static content
-file { '/data/web_static/current':
-    ensure => link,
-    target => '/data/web_static/releases/test',
-    owner  => 'ubuntu',
-    group  => 'ubuntu',
-}
+file { '/data/web_static/releases':
+  ensure => 'directory'
+} ->
 
-# Define homepage index.html
+file { '/data/web_static/releases/test':
+  ensure => 'directory'
+} ->
+
+file { '/data/web_static/shared':
+  ensure => 'directory'
+} ->
+
 file { '/data/web_static/releases/test/index.html':
-    ensure  => file,
-    content => "<!DOCTYPE html>
-<html lang='en-US'>
-        <head>
-                <title>Home - AirBnB Clone</title>
-        </head>
-        <body>
-                <h1>Welcome to AirBnB!</h1>
-        <body>
-</html>",
-    owner   => 'ubuntu',
-    group   => 'ubuntu',
-    require => File['/data/web_static/current'],
+  ensure  => 'present',
+  content => "Holberton School Puppet\n"
+} ->
+
+file { '/data/web_static/current':
+  ensure => 'link',
+  target => '/data/web_static/releases/test'
+} ->
+
+exec { 'chown -R ubuntu:ubuntu /data/':
+  path => '/usr/bin/:/usr/local/bin/:/bin/'
+}
+
+file { '/var/www':
+  ensure => 'directory'
+} ->
+
+file { '/var/www/html':
+  ensure => 'directory'
+} ->
+
+file { '/var/www/html/index.html':
+  ensure  => 'present',
+  content => "Holberton School Nginx\n"
+} ->
+
+file { '/var/www/html/404.html':
+  ensure  => 'present',
+  content => "Ceci n'est pas une page\n"
+} ->
+
+file { '/etc/nginx/sites-available/default':
+  ensure  => 'present',
+  content => $nginx_conf
+} ->
+
+exec { 'nginx restart':
+  path => '/etc/init.d/'
 }
