@@ -15,12 +15,12 @@ def do_pack():
         os.mkdir("versions")
     cur_time = datetime.now()
     output = "versions/web_static_{}{}{}{}{}{}.tgz".format(
-    str(cur_time.year),
-    str(cur_time.month).zfill(2),
-    str(cur_time.day).zfill(2),
-    str(cur_time.hour).zfill(2),
-    str(cur_time.minute).zfill(2),
-    str(cur_time.second).zfill(2)
+        str(cur_time.year),
+        str(cur_time.month).zfill(2),
+        str(cur_time.day).zfill(2),
+        str(cur_time.hour).zfill(2),
+        str(cur_time.minute).zfill(2),
+        str(cur_time.second).zfill(2)
     )
     try:
         print("Packing web_static to {}".format(output))
