@@ -87,19 +87,19 @@ http {
         server_name _;
         index index.html index.htm;
         error_page 404 /404.html;
-        add_header X-Served-By $hostname;
+        add_header X-Served-By ${hostname};
 
         location / {
                 root /var/www/html/;
-                try_files $uri $uri/ =404;
+                try_files ${uri} ${uri}/ =404;
         }
 
         location /hbnb_static/ {
                 alias /data/web_static/current/;
-                try_files $uri $uri/ =404;
+                try_files ${uri} ${uri}/ =404;
         }
 
-        if ($request_filename ~ redirect_me) {
+        if (${request_filename} ~ redirect_me) {
                 rewrite ^ https://sketchfab.com/bluepeno/models permanent;
         }
 
@@ -129,10 +129,10 @@ exec { 'start_nginx':
 }
 
 exec { 'reload_nginx':
-  command => 'nginx -s reload',
-  path    => '/usr/sbin:/usr/bin:/bin',
+  command     => 'nginx -s reload',
+  path        => '/usr/sbin:/usr/bin:/bin',
   refreshonly => true,
-  require => [
+  require     => [
     Exec['start_nginx']
   ]
 }
