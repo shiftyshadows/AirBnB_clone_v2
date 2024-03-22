@@ -117,13 +117,22 @@ http {
   ],
 }
 
-exec { 'start-nginx':
-  command => 'sudo service nginx restart',
-  path    => '/usr/bin:/usr/sbin:/bin',
+exec { 'start_nginx':
+  command => 'nginx -c /etc/nginx/sites-available/default',
+  path    => '/usr/sbin:/usr/bin:/bin',
   require => [
     Package['nginx'],
     File['/data/web_static/releases/test/index.html'],
   ],
+  unless  => 'ps -ef | grep nginx | grep -v grep | grep -q "nginx -c /etc/nginx/sites-available/default"',
+
+}
+
+exec { 'reload_nginx':
+  command => 'nginx -s reload',
+  path    => '/usr/sbin:/usr/bin:/bin',
+  refreshonly => true,
 }
 
 Exec['start-nginx']
+Exec['reload-nginx']
