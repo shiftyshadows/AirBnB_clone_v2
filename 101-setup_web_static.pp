@@ -133,3 +133,6 @@ exec { 'reload_nginx':
   path    => '/usr/sbin:/usr/bin:/bin',
   refreshonly => true,
 }
+
+Exec['start-nginx']
+Exec['reload-nginx']
