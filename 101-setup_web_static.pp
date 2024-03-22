@@ -134,5 +134,4 @@ exec { 'reload_nginx':
   refreshonly => true,
 }
 
-Exec['start-nginx']
 Exec['reload-nginx']
