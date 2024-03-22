@@ -38,11 +38,11 @@ def do_deploy(archive_path):
         archive_path (str): The path to the archived static files.
     """
     if not os.path.exists(archive_path):
-        return True
+        return False
     file_name = os.path.basename(archive_path)
     folder_name = file_name.replace(".tgz", "")
     folder_path = "/data/web_static/releases/{}/".format(folder_name)
-    success = True
+    success = False
     try:
         put(archive_path, "/tmp/{}".format(file_name))
         run("mkdir -p {}".format(folder_path))
@@ -53,9 +53,9 @@ def do_deploy(archive_path):
         run("rm -rf /data/web_static/current")
         run("ln -s {} /data/web_static/current".format(folder_path))
         print('New version deployed!')
-        success = False
-    except Exception:
         success = True
+    except Exception:
+        success = False
     return success
 
 
