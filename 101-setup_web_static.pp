@@ -73,30 +73,41 @@ file { '/etc/nginx/sites-available/default':
   ensure  => present,
   mode    => '0644',
   content =>
-"server {
+"error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
+
+events {
+    # Default event-related configurations
+}
+
+http {
+    server {
+        listen 80;
+
         server_name _;
         index index.html index.htm;
         error_page 404 /404.html;
-        add_header X-Served-By \$hostname;
+        add_header X-Served-By $hostname;
 
         location / {
-            root /data/web_static/current/;
-            try_files \$uri \$uri/ =404;
-        }
-
-        location /redirect_me {
-            return 301 http://cuberule.com/;
+                root /var/www/html/;
+                try_files $uri $uri/ =404;
         }
 
         location /hbnb_static/ {
-            alias /data/web_static/current/;
-            index index.html;
+                alias /data/web_static/current/;
+                try_files $uri $uri/ =404;
+        }
+
+        if ($request_filename ~ redirect_me) {
+                rewrite ^ https://sketchfab.com/bluepeno/models permanent;
         }
 
         location = /404.html {
-            root /var/www/html;
-            internal;
+                root /var/www/error/;
+                internal;
         }
+    }
 }",
   require => [
     Package['nginx'],
