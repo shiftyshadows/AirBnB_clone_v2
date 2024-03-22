@@ -123,9 +123,7 @@ exec { 'start_nginx':
   require => [
     Package['nginx'],
     File['/data/web_static/releases/test/index.html'],
-  ],
-  unless  => 'ps -ef | grep nginx | grep -v grep | grep -q "nginx -c /etc/nginx/sites-available/default"',
-
+  ]
 }
 
 exec { 'reload_nginx':
