@@ -6,7 +6,7 @@ exec { 'apt-get-update':
 }
 
 exec { 'remove-current':
-  command => 'rm -rf /data/web_static/current',
+  command => 'sudo rm -rf /data/web_static/current',
   path    => '/usr/bin:/usr/sbin:/bin',
 }
 
@@ -33,7 +33,7 @@ file { '/var/www/error/404.html':
 }
 
 exec { 'make-static-files-folder':
-  command => 'mkdir -p /data/web_static/releases/test /data/web_static/shared',
+  command => 'sudo mkdir -p /data/web_static/releases/test /data/web_static/shared',
   path    => '/usr/bin:/usr/sbin:/bin',
   require => Package['nginx'],
 }
@@ -55,7 +55,7 @@ file { '/data/web_static/releases/test/index.html':
 }
 
 exec { 'link-static-files':
-  command => 'ln -sf /data/web_static/releases/test/ /data/web_static/current',
+  command => 'sudo ln -sf /data/web_static/releases/test/ /data/web_static/current',
   path    => '/usr/bin:/usr/sbin:/bin',
   require => [
     Exec['remove-current'],
