@@ -61,8 +61,10 @@ class DBStorage:
             if cls is None else [cls]
 
         for model_class in classes_to_query:
-            model_name = model_class.__name__
-            query_result = self.__session.query(model_class).all()
+            m_class=globals()[model_class]
+#            model_name = globals()[model_class].__name__
+            model_name = m_class.__name__
+            query_result = self.__session.query(m_class).all()
             for obj in query_result:
                 key = f"{model_name}.{obj.id}"
                 result[key] = obj

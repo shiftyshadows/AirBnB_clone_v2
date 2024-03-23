@@ -16,8 +16,8 @@ place_amenity = Table(
 class Place(BaseModel,Base):
     """Representation of Place """
     __tablename__ = 'places'
-    city_id = Column(String(60), ForeignKey('cities.id'), nullable=False)
     user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
+    city_id = Column(String(60), ForeignKey('cities.id'), nullable=False)
     name = Column(String(128), nullable=False)
     description = Column(String(1024), nullable=True)
     number_rooms = Column(Integer, nullable=False, default=0)
@@ -26,10 +26,10 @@ class Place(BaseModel,Base):
     price_by_night = Column(Integer, nullable=False, default=0)
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
-    # Define the back-reference from Place to User
-    user = relationship('User', back_populates='places')
     # Define the back-reference from Place to City
     city = relationship('City', back_populates='places')
+    # Define the back-reference from Place to User
+    user = relationship('User', back_populates='places')
     # Define the back-reference from Review to Place
     reviews = relationship('Review', back_populates='place', cascade='all, delete-orphan')
     # Define the Many-to-Many relationship with the Amenity class
@@ -43,6 +43,7 @@ class Place(BaseModel,Base):
            It is automatically called when an instance of the class is created,
            and its purpose is to initialize the attributes of the object.
         """
+        self.city_id = kwargs.get('city_id', "")
         super().__init__(*args, **kwargs)
 
     @property

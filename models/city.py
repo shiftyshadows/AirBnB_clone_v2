@@ -13,7 +13,7 @@ class City(BaseModel, Base):
     # Define the relationship with the State class
     state = relationship("State", back_populates="cities")
     # Define the relationship with the Place class
-    places = relationship('Place', back_populates='city', cascade='all, delete-orphan')
+    places = relationship('Place', back_populates='city', cascade='all, delete')
 
     def __init__(self, *args, **kwargs):
         """
