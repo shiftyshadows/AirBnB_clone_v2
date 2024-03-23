@@ -5,8 +5,7 @@
 from flask import Flask, render_template
 from models import storage
 
-#Starts the application instance
-app=Flask(__name__)
+app = Flask(__name__)
 app.url_map.strict_slashes = False
 
 
@@ -31,12 +30,6 @@ def states_list():
     }
 
     return render_template('7-states_list.html', **ctxt)
-
-
-@app.route('/')
-def index():
-    ''' Defines the index page. '''
-    return 'Hello HBNB'
 
 
 if __name__ == '__main__':
