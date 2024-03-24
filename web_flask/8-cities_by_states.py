@@ -2,12 +2,12 @@
 """
    Script that starts a Flask web application.
 """
-
 from flask import Flask, render_template
-from models import storage, State
+from models import storage
+#from models.state import State
 
 app = Flask(__name__)
-
+app.url_map.strict_slashes = False
 
 @app.teardown_appcontext
 def teardown_session(exception):
@@ -15,13 +15,15 @@ def teardown_session(exception):
     storage.close()
 
 
-@app.route('/cities_by_states', strict_slashes=False)
+@app.route('/cities_by_states', methods=['GET'])
 def cities_by_states():
     """Display a HTML page with states and their cities"""
-    states = storage.all(State).values()
-    sorted_states = sorted(states, key=lambda state: state.name)
-
-    return render_template('cities_by_states.html', states=sorted_states)
+    all_states = list(storage.all("State").values())
+    all_states.sort(key=lambda state: state.name)
+    ctxt = {
+        'states': all_states
+    }
+    return render_template('8-cities_by_states.html', **ctxt)
 
 
 if __name__ == "__main__":
