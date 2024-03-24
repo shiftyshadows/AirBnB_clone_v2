@@ -12,10 +12,26 @@ class State(BaseModel, Base):
     id = Column(String(60), primary_key=True, nullable=False)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
-    name = Column(String(128), nullable=False)
+    name = Column(
+        String(128), nullable=False
+    ) if os.getenv('HBNB_TYPE_STORAGE') == 'db' else ''
     # Define relationship to City
-    cities = relationship(
-        "City", back_populates="state", cascade="all, delete-orphan")
+    if os.getenv('HBNB_TYPE_STORAGE') == 'db':
+        cities = relationship(
+            'City',
+            cascade='all, delete, delete-orphan',
+            backref='state'
+        )
+    else:
+        @property
+        def cities(self):
+            """Returns the cities in this State"""
+            from models import storage
+            cities_in_state = []
+            for value in storage.all(City).values():
+                if value.state_id == self.id:
+                    cities_in_state.append(value)
+            return cities_in_state
 
     def __init__(self, *args, **kwargs):
         """
