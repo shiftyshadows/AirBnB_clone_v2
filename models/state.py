@@ -1,13 +1,17 @@
 #!/usr/bin/python3
 """ This module defines the class: State.  """
+from datetime import datetime
 from models.base_model import BaseModel, Base
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, DateTime
 from sqlalchemy.orm import relationship
 
 
 class State(BaseModel, Base):
     """Representation of state """
     __tablename__ = 'states'
+    id = Column(String(60), primary_key=True, nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
     name = Column(String(128), nullable=False)
     # Define relationship to City
     cities = relationship(

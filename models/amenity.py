@@ -21,6 +21,6 @@ class Amenity(BaseModel, Base):
         super().__init__(*args, **kwargs)
 
 
-#engine = create_engine(
-#    "mysql+mysqldb://hbnb_dev:hbnb_dev_pwd@localhost/hbnb_dev_db", echo=False)
-#Base.metadata.create_all(engine)
+engine = create_engine(
+    "mysql+mysqldb://hbnb_dev:hbnb_dev_pwd@localhost/hbnb_dev_db", echo=False)
+Base.metadata.create_all(engine)

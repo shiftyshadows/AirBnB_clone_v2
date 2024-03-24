@@ -12,6 +12,7 @@ Base = declarative_base()
 
 class BaseModel:
     """ This class defines all common attributes/methods for other classes. """
+    __abstract__ = True
     id = Column(String(60), primary_key=True, nullable=False)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
