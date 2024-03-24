@@ -13,7 +13,7 @@ place_amenity = Table(
 )
 
 
-class Place(BaseModel,Base):
+class Place(BaseModel, Base):
     """Representation of Place """
     __tablename__ = 'places'
     user_id = Column(String(60), ForeignKey('users.id'), nullable=False)

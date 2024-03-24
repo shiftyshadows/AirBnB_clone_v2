@@ -1,7 +1,7 @@
 #!/usr/bin/python3
-'''
+"""
    A simple flask application.
-'''
+"""
 from flask import Flask, render_template
 from models import storage
 
@@ -23,7 +23,7 @@ def states_list():
     """
        Display HTML page with list of states
     """
-    all_states = list(storage.all("State").values())  # Fetch all State objects
+    all_states = list(storage.all("State").values())
     all_states.sort(key=lambda state: state.name)
     ctxt = {
         'states': all_states
