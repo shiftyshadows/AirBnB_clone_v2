@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """This module defines the DBStorage Engine. """
 import os
+import MySQLdb
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
@@ -31,17 +32,24 @@ class DBStorage:
 
         dialect = 'mysql'
         driver = 'mysqldb'
-        user = os.environ.get('HBNB_MYSQL_USER')
-        password = os.environ.get('HBNB_MYSQL_PWD')
-        host = os.environ.get('HBNB_MYSQL_HOST', 'localhost')
-        database = os.environ.get('HBNB_MYSQL_DB')
+        hb_user = os.environ.get('HBNB_MYSQL_USER')
+        hb_password = os.environ.get('HBNB_MYSQL_PWD')
+        hb_host = os.environ.get('HBNB_MYSQL_HOST', 'localhost')
+        hb_database = os.environ.get('HBNB_MYSQL_DB')
         ppp = True
-        env = os.environ.get('HBNB_ENV')
+        hb_env = os.environ.get('HBNB_ENV')
+
+        connection = MySQLdb.connect(
+            host=hb_host, user=hb_user, password=hb_password)
+        cursor = connection.cursor()
+        cursor.execute("CREATE DATABASE IF NOT EXISTS {}".format(hb_database))
+        cursor.close()
+        connection.close()
 
         connection_string = "{}+{}://{}:{}@{}/{}".format(
-            dialect, driver, user, password, host, database)
+            dialect, driver, hb_user, hb_password, hb_host, hb_database)
         self.__engine = create_engine(connection_string, pool_pre_ping=ppp)
-        if env == 'test':
+        if hb_env == 'test':
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
@@ -61,7 +69,7 @@ class DBStorage:
             if cls is None else [cls]
 
         for model_class in classes_to_query:
-            m_class=globals()[model_class]
+            m_class = globals()[model_class]
 #            model_name = globals()[model_class].__name__
             model_name = m_class.__name__
             query_result = self.__session.query(m_class).all()
