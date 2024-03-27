@@ -65,14 +65,13 @@ class DBStorage:
                 value = object
         """
         result = {}
-        classes_to_query = [State, City, User, Place, Review, Amenity] \
-            if cls is None else [cls]
+        if cls is None:
+            classes_to_query = [State, City, User, Place, Review, Amenity]
+        else:
+            classes_to_query = [globals()[cls]]
 
         for model_class in classes_to_query:
-            m_class = globals()[model_class]
-#            model_name = globals()[model_class].__name__
-            model_name = m_class.__name__
-            query_result = self.__session.query(m_class).all()
+            query_result = self.__session.query(model_class).all()
             for obj in query_result:
                 key = f"{model_name}.{obj.id}"
                 result[key] = obj
@@ -111,9 +110,9 @@ class DBStorage:
            Create all tables in the database and create the current
            database session.
         """
-        Base.metadata.create_all(self.__engine)
         sesh_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
         self.__session = scoped_session(sesh_factory)
+        Base.metadata.create_all(self.__engine)
 
     def close(self):
         """Close the current database session."""

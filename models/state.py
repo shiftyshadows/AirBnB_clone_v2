@@ -2,6 +2,7 @@
 """ This module defines the class: State.  """
 from datetime import datetime
 from models.base_model import BaseModel, Base
+# from sqlalchemy import Column, String, DateTime, create_engine
 from sqlalchemy import Column, String, DateTime
 from sqlalchemy.orm import relationship
 
@@ -24,3 +25,7 @@ class State(BaseModel, Base):
            and its purpose is to initialize the attributes of the object.
         """
         super().__init__(*args, **kwargs)
+
+# engine = create_engine(
+#    "mysql+mysqldb://hbnb_dev:hbnb_dev_pwd@localhost/hbnb_dev_db", echo=False)
+# Base.metadata.create_all(engine)

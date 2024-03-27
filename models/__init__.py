@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 """Initializes the package"""
 from os import environ
+#from models.state import State
+#from models.base_model import BaseModel
 
 #environ["HBNB_MYSQL_USER"] = "hbnb_dev"
 #environ["HBNB_MYSQL_PWD"] = "hbnb_dev_pwd"
