@@ -22,7 +22,7 @@ def states(state_id=None):
     states_dict = list(storage.all('State').keys())
     instance_ids = []
     for state_item in states_dict:
-        class_name, instance_id = state_item.split('.')
+        class_name, name_00, instance_id = state_item.split('.')
         instance_ids.append(instance_id)
     if state_id is None:
         all_states = list(storage.all("State").values())
