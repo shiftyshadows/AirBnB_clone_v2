@@ -20,6 +20,8 @@ def cities_by_states():
     """Display a HTML page with states and their cities"""
     all_states = list(storage.all("State").values())
     all_states.sort(key=lambda state: state.name)
+    for state in all_states:
+        state.cities.sort(key=lambda city: city.name)
     ctxt = {
         'states': all_states
     }
