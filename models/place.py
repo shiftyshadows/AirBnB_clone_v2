@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 """ This module defines the class: Place.  """
+
+from datetime import datetime
 from models.base_model import BaseModel, Base
-from sqlalchemy import Column, String, Integer, Float, ForeignKey, Table
+from sqlalchemy import Column, String, Integer, Float, ForeignKey, Table, DateTime, create_engine
 from sqlalchemy.orm import relationship
 
 # Define the association table for the Many-to-Many relationship
@@ -26,10 +28,13 @@ class Place(BaseModel, Base):
     price_by_night = Column(Integer, nullable=False, default=0)
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
-    # Define the back-reference from Place to City
-    city = relationship('City', back_populates='places')
+    id = Column(String(60), primary_key=True, nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
     # Define the back-reference from Place to User
     user = relationship('User', back_populates='places')
+    # Define the back-reference from Place to City
+    city = relationship('City', back_populates='places')
     # Define the back-reference from Review to Place
     reviews = relationship('Review', back_populates='place', cascade='all, delete-orphan')
     # Define the Many-to-Many relationship with the Amenity class
