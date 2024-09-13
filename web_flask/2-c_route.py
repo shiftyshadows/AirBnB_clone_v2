@@ -1,7 +1,7 @@
 #!/usr/bin/python3
-'''
+"""
    This module defines a script that starts a Flask web application.
-'''
+"""
 from flask import Flask, escape
 app = Flask(__name__)
 
