@@ -1,38 +1,50 @@
 #!/usr/bin/python3
-""" This module defines a script that starts a Flask web application."""
-from flask import Flask, escape
+"""Starts a Flask web application.
+
+The application listens on 0.0.0.0, port 5000.
+Routes:
+    /: Displays 'Hello HBNB!'.
+    /hbnb: Displays 'HBNB'.
+    /c/<text>: Displays 'C' followed by the value of <text>.
+    /python/(<text>): Displays 'Python' followed by the value of <text>.
+"""
+from flask import Flask
 
 app = Flask(__name__)
 
 
-@app.route('/', strict_slashes=False)
-# Route for the root path
+@app.route("/", strict_slashes=False)
 def hello_hbnb():
-    return 'Hello HBNB!'
+    """Displays 'Hello HBNB!'."""
+    return "Hello HBNB!"
 
 
-@app.route('/hbnb', strict_slashes=False)
-# Route for the /hbnb path
+@app.route("/hbnb", strict_slashes=False)
 def hbnb():
-    return 'HBNB'
+    """Displays 'HBNB'."""
+    return "HBNB"
 
 
-@app.route('/c/<text>', strict_slashes=False)
-# Route for the /c/<text> path
-def custom_text(text):
-    # Replace underscore symbols with a space
-    text = escape(text).replace('_', ' ')
-    return 'C {}'.format(text)
+@app.route("/c/<text>", strict_slashes=False)
+def c(text):
+    """Displays 'C' followed by the value of <text>.
+
+    Replaces any underscores in <text> with slashes.
+    """
+    text = text.replace("_", " ")
+    return "C {}".format(text)
 
 
-@app.route('/python/<text>', strict_slashes=False)
-@app.route('/python/', strict_slashes=False)
-def python_text(text='is cool'):
-    # Replace underscore symbols with a space
-    text = escape(text).replace('_', ' ')
-    return 'Python {}'.format(text)
+@app.route("/python", strict_slashes=False)
+@app.route("/python/<text>", strict_slashes=False)
+def python(text="is cool"):
+    """Displays 'Python' followed by the value of <text>.
+
+    Replaces any underscores in <text> with slashes.
+    """
+    text = text.replace("_", " ")
+    return "Python {}".format(text)
 
 
-if __name__ == '__main__':
-    # Run the Flask app on 0.0.0.0, port 5000
-    app.run(host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0")
