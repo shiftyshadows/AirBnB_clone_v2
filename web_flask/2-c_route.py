@@ -7,16 +7,19 @@ app = Flask(__name__)
 
 @app.route('/', strict_slashes=False)
 def hello_hbnb():
+    """ This route return a string. """
     return 'Hello HBNB!'
 
 
 @app.route('/hbnb', strict_slashes=False)
 def hbnb():
+    """ This route return a string. """
     return 'HBNB'
 
 
 @app.route('/c/<text>', strict_slashes=False)
 def custom_text(text):
+    """ This route return a custom string. """
     text = escape(text).replace('_', ' ')
     return 'C {}'.format(text)
 
