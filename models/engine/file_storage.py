@@ -23,8 +23,17 @@ class FileStorage:
         "Review": "models.review",
             }
 
-    def all(self):
-        """ This method returns the dictionary __objects. """
+    def all(self, cls=None):
+        """
+           Returns a dictionary of objects filtered by class if
+           cls is provided. Otherwise, returns all objects.
+        """
+        object_dict = {}
+        if cls:
+            for key, obj in self.__objects.items():
+                if obj.__class__.__name__ == cls:
+                    object_dict[key] = obj
+            return object_dict
         return FileStorage.__objects
 
     def new(self, obj):

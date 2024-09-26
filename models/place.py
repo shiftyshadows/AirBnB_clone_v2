@@ -8,8 +8,12 @@ from sqlalchemy.orm import relationship
 place_amenity = Table(
     'place_amenity',
     Base.metadata,
-    Column('place_id', String(60), ForeignKey('places.id'), primary_key=True, nullable=False),
-    Column('amenity_id', String(60), ForeignKey('amenities.id'), primary_key=True, nullable=False)
+    Column(
+        'place_id', String(60), ForeignKey(
+            'places.id'), primary_key=True, nullable=False),
+    Column(
+        'amenity_id', String(60), ForeignKey(
+            'amenities.id'), primary_key=True, nullable=False)
 )
 
 
@@ -17,7 +21,8 @@ class Place(BaseModel, Base):
     """Representation of Place """
     __tablename__ = 'places'
     user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
-    city_id = Column(String(60), ForeignKey('cities.id', ondelete='CASCADE'), nullable=False)
+    city_id = Column(String(60), ForeignKey(
+        'cities.id', ondelete='CASCADE'), nullable=False)
     name = Column(String(128), nullable=False)
     description = Column(String(1024), nullable=True)
     number_rooms = Column(Integer, nullable=False, default=0)
@@ -31,9 +36,14 @@ class Place(BaseModel, Base):
     # Define the back-reference from Place to User
     user = relationship('User', back_populates='places')
     # Define the back-reference from Review to Place
-    reviews = relationship('Review', back_populates='place', cascade='all, delete-orphan')
+    reviews = relationship(
+        'Review', back_populates='place', cascade='all, delete-orphan')
     # Define the Many-to-Many relationship with the Amenity class
-    amenities = relationship('Amenity', secondary=place_amenity, back_populates='places', viewonly=False)
+    amenities = relationship(
+        'Amenity',
+        secondary=place_amenity,
+        back_populates='places',
+        viewonly=False)
     # FileStorage Relationships (Getter and Setter)
     amenity_ids = []
 
