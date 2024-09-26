@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """ This module defines the class: City.  """
 from models.base_model import BaseModel, Base
-from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy import create_engine, Column, String, ForeignKey
 from sqlalchemy.orm import relationship
 from os import getenv
 
@@ -30,3 +30,7 @@ class City(BaseModel, Base):
            and its purpose is to initialize the attributes of the object.
         """
         super().__init__(*args, **kwargs)
+
+engine = create_engine(
+    "mysql+mysqldb://hbnb_dev:hbnb_dev_pwd@localhost/hbnb_dev_db", echo=False)
+Base.metadata.create_all(engine)
