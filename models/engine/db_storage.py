@@ -66,13 +66,23 @@ class DBStorage:
         """
         result = {}
         if cls is None:
-            classes_to_query = [State, City, User, Place, Review, Amenity]
+            classes_to_query = [State, City, User, Place, Amenity, Review]
         else:
-            classes_to_query = [globals()[cls]]
+            if type(cls) is str:
+                classes_to_query = [globals()[cls]]
+            else:
+                cls = "{}".format(cls)
+                modl_path, cls_nme = cls.rsplit(".", 1)
+                cls_nme = cls_nme[:-2]
+                classes_to_query = [globals()[cls_nme]]
 
         for model_class in classes_to_query:
             query_result = self.__session.query(model_class).all()
-            model_name = model_class.name
+            if model_class is User:
+                model_name = "{} {}".format(
+                    model_class.first_name, model_class.last_name)
+            else:
+                model_name = model_class.name
             for obj in query_result:
                 key = f"{model_name}.{obj.id}"
                 result[key] = obj
