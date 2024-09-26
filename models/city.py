@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """ This module defines the class: City.  """
 from models.base_model import BaseModel, Base
-from sqlalchemy import create_engine, Column, String, ForeignKey
+from sqlalchemy import Column, String, ForeignKey, create_engine
 from sqlalchemy.orm import relationship
 from os import getenv
 
@@ -21,7 +21,7 @@ class City(BaseModel, Base):
     state = relationship("State", back_populates="cities")
     # Define the relationship with the Place class
     places = relationship(
-        'Place', back_populates='city', cascade='all, delete')
+        'Place', back_populates="city", cascade="all, delete-orphan")
 
     def __init__(self, *args, **kwargs):
         """

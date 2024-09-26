@@ -2,7 +2,7 @@
 """ This module defines the class: State.  """
 from datetime import datetime
 from models.base_model import BaseModel
-from sqlalchemy import Column, String, DateTime, create_engine
+# from sqlalchemy import Column, String, DateTime, create_engine
 from sqlalchemy import Column, String, DateTime
 from sqlalchemy.orm import relationship
 from os import getenv
@@ -18,7 +18,8 @@ class State(BaseModel, Base):
     __tablename__ = 'states'
     name = Column(String(128), nullable=False)
     cities = relationship(
-        "City", back_populates="state", cascade="all, delete-orphan")
+        "City", back_populates="state",
+        cascade="all, delete", passive_deletes=True)
 
     def __init__(self, *args, **kwargs):
         """
@@ -44,6 +45,7 @@ class State(BaseModel, Base):
                     state_cities.append(city)
             return state_cities
 
+
 # engine = create_engine(
-#    "mysql+mysqldb://hbnb_dev:hbnb_dev_pwd@localhost/hbnb_dev_db", echo=False)
+#     "mysql+mysqldb://hbnb_dev:hbnb_dev_pwd@localhost/hbnb_dev_db", echo=False)
 # Base.metadata.create_all(engine)
