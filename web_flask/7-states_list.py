@@ -10,7 +10,7 @@ app.url_map.strict_slashes = False
 
 
 @app.teardown_appcontext
-def teardown_session(exception=None):
+def teardown_session(exception):
     """
        Method to remove SQLAlchemy session
        after each request.
