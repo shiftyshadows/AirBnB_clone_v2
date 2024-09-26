@@ -28,20 +28,21 @@ class State(BaseModel, Base):
         """
         super().__init__(*args, **kwargs)
 
-    @property
-    def cities(self):
-        """
-           Getter for the cities attribute.
-           Returns:
-               List of City instances related to the current State.
-        """
-        from models import storage
-        all_cities = storage.all("City")
-        state_cities = []
-        for city in all_cities.values():
-            if city.state_id == self.id:
-                state_cities.append(city)
-        return state_cities
+    if getenv('HBNB_TYPE_STORAGE') != 'db':
+        @property
+        def cities(self):
+            """
+               Getter for the cities attribute.
+               Returns:
+                   List of City instances related to the current State.
+            """
+            from models import storage
+            all_cities = storage.all("City")
+            state_cities = []
+            for city in all_cities.values():
+                if city.state_id == self.id:
+                    state_cities.append(city)
+            return state_cities
 
 # engine = create_engine(
 #    "mysql+mysqldb://hbnb_dev:hbnb_dev_pwd@localhost/hbnb_dev_db", echo=False)
