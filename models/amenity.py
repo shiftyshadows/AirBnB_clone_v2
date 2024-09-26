@@ -2,7 +2,7 @@
 """ This module defines the class: Amenity.  """
 from models.base_model import BaseModel, Base
 from models.place import place_amenity
-from sqlalchemy import create_engine, Column, String, Table, ForeignKey
+from sqlalchemy import Column, String, Table, ForeignKey
 from sqlalchemy.orm import relationship
 
 
@@ -21,6 +21,6 @@ class Amenity(BaseModel, Base):
         super().__init__(*args, **kwargs)
 
 
-engine = create_engine(
-    "mysql+mysqldb://hbnb_dev:hbnb_dev_pwd@localhost/hbnb_dev_db", echo=False)
-Base.metadata.create_all(engine)
+# engine = create_engine(
+#     "mysql+mysqldb://hbnb_dev:hbnb_dev_pwd@localhost/hbnb_dev_db", echo=False)
+# Base.metadata.create_all(engine)
